@@ -1,155 +1,193 @@
 <?php
-// admin/classes/CategoryManager.php
+// admin/classes/ProductManager.php
 
-require_once __DIR__ . '/../includes/database.php';
+require_once __DIR__ . '/../includes/database.php'; // Ensure this path is correct
 
-class CategoryManager {
+class ProductManager {
     private $conn;
 
     public function __construct() {
-        $this->conn = getDbConnection();
+        $this->conn = getDbConnection(); // Get the single, shared database connection
     }
 
     /**
-     * Adds a new category to the database.
-     * @param string $name The name of the category.
-     * @return bool True on success, false on failure (e.g., category already exists).
+     * Adds a new product to the database.
+     * @param string $name
+     * @param string $description
+     * @param float $price
+     * @param int $categoryId
+     * @param int $stock
+     * @param string $imageUrl
+     * @return bool True on success, false on failure.
      */
-    public function addCategory($name) {
-        // Check if category already exists
-        $checkSql = "SELECT id FROM categories WHERE name = ?";
-        $stmtCheck = $this->conn->prepare($checkSql);
-        if (!$stmtCheck) {
-            error_log("CategoryManager: Check prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
-            return false;
-        }
-        $stmtCheck->bind_param("s", $name);
-        $stmtCheck->execute();
-        $resultCheck = $stmtCheck->get_result();
-        if ($resultCheck->num_rows > 0) {
-            // Category with this name already exists
-            $stmtCheck->close();
-            return false;
-        }
-        $stmtCheck->close();
-
-        $sql = "INSERT INTO categories (name) VALUES (?)";
+    public function addProduct($name, $description, $price, $categoryId, $stock, $imageUrl) {
+        $sql = "INSERT INTO products (name, description, price, category_id, stock, image_url, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())";
         $stmt = $this->conn->prepare($sql);
         if (!$stmt) {
-            error_log("CategoryManager: Add prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
+            error_log("ProductManager::addProduct - Prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
             return false;
         }
-        $stmt->bind_param("s", $name);
+        $stmt->bind_param("ssdiis", $name, $description, $price, $categoryId, $stock, $imageUrl);
         $result = $stmt->execute();
         $stmt->close();
         return $result;
     }
 
     /**
-     * Retrieves all categories from the database.
-     * @return array An array of category associative arrays.
+     * Retrieves all products from the database.
+     * @return array An array of product associative arrays.
      */
-    public function getAllCategories() {
-        $sql = "SELECT * FROM categories ORDER BY name ASC";
+    public function getAllProducts() {
+        $sql = "SELECT p.*, c.name AS category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id ORDER BY p.name ASC";
         $result = $this->conn->query($sql);
-        $categories = [];
+        $products = [];
         if ($result && $result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
-                $categories[] = $row;
+                $products[] = $row;
             }
         }
-        return $categories;
+        return $products;
     }
 
     /**
-     * Retrieves a category by its ID.
-     * @param int $categoryId
-     * @return array|null An associative array of category data, or null if not found.
+     * Retrieves a product by its ID.
+     * @param int $productId
+     * @return array|null An associative array of product data, or null if not found.
      */
-    public function getCategoryById($categoryId) {
-        $sql = "SELECT * FROM categories WHERE id = ?";
+    public function getProductById($productId) {
+        $sql = "SELECT p.*, c.name AS category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = ?";
         $stmt = $this->conn->prepare($sql);
         if (!$stmt) {
-            error_log("CategoryManager: Prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
+            error_log("ProductManager::getProductById - Prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
             return null;
         }
-        $stmt->bind_param("i", $categoryId);
+        $stmt->bind_param("i", $productId);
         $stmt->execute();
         $result = $stmt->get_result();
-        $category = $result->fetch_assoc();
+        $product = $result->fetch_assoc();
         $stmt->close();
-        return $category;
+        return $product;
     }
 
     /**
-     * Updates an existing category.
-     * @param int $id The ID of the category.
-     * @param string $name The new name for the category.
+     * Updates an existing product.
+     * @param int $id
+     * @param string $name
+     * @param string $description
+     * @param float $price
+     * @param int $categoryId
+     * @param int $stock
+     * @param string|null $imageUrl The new image URL, or null to keep existing.
      * @return bool True on success, false on failure.
      */
-    public function updateCategory($id, $name) {
-        // Check if a category with the new name already exists (excluding the current category being updated)
-        $checkSql = "SELECT id FROM categories WHERE name = ? AND id != ?";
-        $stmtCheck = $this->conn->prepare($checkSql);
-        if (!$stmtCheck) {
-            error_log("CategoryManager: Update check prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
-            return false;
-        }
-        $stmtCheck->bind_param("si", $name, $id);
-        $stmtCheck->execute();
-        $resultCheck = $stmtCheck->get_result();
-        if ($resultCheck->num_rows > 0) {
-            // A different category with this name already exists
-            $stmtCheck->close();
-            return false;
-        }
-        $stmtCheck->close();
+    public function updateProduct($id, $name, $description, $price, $categoryId, $stock, $imageUrl = null) {
+        $sql = "UPDATE products SET name = ?, description = ?, price = ?, category_id = ?, stock = ?, updated_at = NOW()";
+        $types = "ssdiis";
+        $params = [$name, $description, $price, $categoryId, $stock];
 
-        $sql = "UPDATE categories SET name = ? WHERE id = ?";
+        if ($imageUrl !== null) { // Only update image_url if a new one is provided
+            $sql .= ", image_url = ?";
+            $types .= "s";
+            $params[] = $imageUrl;
+        }
+
+        $sql .= " WHERE id = ?";
+        $params[] = $id;
+        $types .= "i";
+
         $stmt = $this->conn->prepare($sql);
         if (!$stmt) {
-            error_log("CategoryManager: Update prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
+            error_log("ProductManager::updateProduct - Prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
             return false;
         }
-        $stmt->bind_param("si", $name, $id);
+        $stmt->bind_param($types, ...$params);
         $result = $stmt->execute();
         $stmt->close();
         return $result;
     }
 
     /**
-     * Deletes a category by its ID.
-     * Note: This will fail if there are products associated with this category
-     * due to foreign key constraints (ON DELETE RESTRICT).
-     * You would need to reassign products or delete them first.
-     * @param int $categoryId
+     * Deletes a product by its ID.
+     * @param int $productId
      * @return bool True on success, false on failure.
      */
-    public function deleteCategory($categoryId) {
-        $sql = "DELETE FROM categories WHERE id = ?";
+    public function deleteProduct($productId) {
+        // Optional: Get product details to delete image file from server
+        $product = $this->getProductById($productId);
+        if ($product && !empty($product['image_url'])) {
+            // Construct the absolute path to the image file
+            // BASE_URL for admin is usually relative to htdocs/msgm_clothing/admin/
+            // Product image URLs are saved as 'admin/uploads/products/filename.jpg'
+            // So, from admin/, it's '../admin/uploads/products/filename.jpg'
+            $imagePath = realpath(__DIR__ . '/../' . $product['image_url']);
+
+            if ($imagePath && file_exists($imagePath) && is_file($imagePath)) {
+                // Ensure the path is within the allowed uploads directory as a security measure
+                if (strpos($imagePath, realpath(__DIR__ . '/../uploads/products/')) === 0) {
+                    unlink($imagePath); // Delete the actual file
+                } else {
+                    error_log("ProductManager::deleteProduct - Attempt to delete file outside of uploads directory: " . $imagePath);
+                }
+            } else {
+                error_log("ProductManager::deleteProduct - Image file not found or invalid path: " . ($imagePath ?: $product['image_url']));
+            }
+        }
+
+        $sql = "DELETE FROM products WHERE id = ?";
         $stmt = $this->conn->prepare($sql);
         if (!$stmt) {
-            error_log("CategoryManager: Prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
+            error_log("ProductManager::deleteProduct - Prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
             return false;
         }
-        $stmt->bind_param("i", $categoryId);
-        try {
-            $result = $stmt->execute();
-            $stmt->close();
-            return $result;
-        } catch (mysqli_sql_exception $e) {
-            // Catch foreign key constraint violation
-            if ($e->getCode() == 1451) { // Error code for "Cannot delete or update a parent row: a foreign key constraint fails"
-                error_log("Cannot delete category ID {$categoryId}: Products are still assigned to it. Please reassign or delete products first.");
-                // You might return a specific error code or message to the UI here
-                return false;
-            }
-            error_log("CategoryManager: Delete failed: " . $e->getMessage());
-            return false;
-        }
+        $stmt->bind_param("i", $productId);
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
     }
 
-    // Removed __destruct() method to prevent multiple connection closes.
-    // The connection will be handled by the global getDbConnection/closeDbConnection functions.
+    /**
+     * Get count of products with stock less than or equal to 0.
+     * @return int
+     */
+    public function getOutOfStockProductCount() {
+        $sql = "SELECT COUNT(*) AS count FROM products WHERE stock <= 0";
+        $result = $this->conn->query($sql);
+        if ($result) {
+            $row = $result->fetch_assoc();
+            return $row['count'];
+        }
+        return 0;
+    }
+
+    /**
+     * Get count of all products.
+     * @return int
+     */
+    public function getTotalProductCount() {
+        $sql = "SELECT COUNT(*) AS count FROM products";
+        $result = $this->conn->query($sql);
+        if ($result) {
+            $row = $result->fetch_assoc();
+            return (int)$row['count']; // Cast to int for safety
+        }
+        return 0;
+    }
+
+    /**
+     * Get count of new arrivals (products added in the last 30 days).
+     * @return int
+     */
+    public function getNewArrivalsCount() {
+        $sql = "SELECT COUNT(*) AS count FROM products WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+        $result = $this->conn->query($sql);
+        if ($result) {
+            $row = $result->fetch_assoc();
+            return (int)$row['count']; // Cast to int for safety
+        }
+        return 0;
+    }
+
+    // IMPORTANT: Removed __destruct() method to prevent "mysqli object is already closed" errors.
+    // The database connection is now managed globally by admin/includes/database.php.
 }
 ?>

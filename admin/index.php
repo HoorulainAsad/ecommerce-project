@@ -2,9 +2,9 @@
 // admin/index.php (Dashboard)
 
 require_once __DIR__ . '/includes/functions.php'; // Includes config and starts session
-require_once __DIR__ . '/classes/ProductManager.php';
+require_once __DIR__ . '/classes/ProductManager.php'; // Crucial: This line must be correct and file must exist
 require_once __DIR__ . '/classes/OrderManager.php';
-require_once __DIR__ . '/classes/UserManager.php'; // New Include
+require_once __DIR__ . '/classes/UserManager.php';
 require_once __DIR__ . '/classes/ReviewManager.php';
 
 // Check if admin is logged in, otherwise redirect to login page
@@ -15,22 +15,19 @@ if (!isLoggedIn()) {
 // Instantiate managers to fetch data for dashboard counts
 $productManager = new ProductManager();
 $orderManager = new OrderManager();
-$userManager = new UserManager();     // New Instance
-$reviewManager = new ReviewManager(); // New Instance
+$userManager = new UserManager();
+$reviewManager = new ReviewManager();
 
 // Fetch dashboard data
-$totalProducts = $productManager->getTotalProductCount(); // Assuming this method exists in ProductManager
+// Ensure these methods exist in your manager classes
+$totalProducts = $productManager->getTotalProductCount();
 $totalOrders = $orderManager->getTotalOrdersCount();
-$totalUsers = $userManager->getTotalUsersCount(); // Get total users from UserManager
+$totalUsers = $userManager->getTotalUsersCount();
 $newArrivalsCount = $productManager->getNewArrivalsCount();
-$trendyCollectionCount = $orderManager->getTrendyProductsCount(); // Get trendy products count
-$pendingReviews = $reviewManager->getReviewCountByStatus('Pending'); // Corrected method call
+$trendyCollectionCount = $orderManager->getTrendyProductsCount();
+$pendingReviews = $reviewManager->getReviewCountByStatus('Pending');
 
 // No explicit unset calls needed here, as the database.php's register_shutdown_function will handle closing.
-// unset($productManager);
-// unset($orderManager);
-// unset($userManager);
-// unset($reviewManager);
 
 ?>
 <!DOCTYPE html>
@@ -57,7 +54,6 @@ $pendingReviews = $reviewManager->getReviewCountByStatus('Pending'); // Correcte
             <h1 class="page-header">Dashboard</h1>
 
             <div class="dashboard-stats">
-                <!-- Each stat-card is now wrapped in an <a> tag -->
                 <a href="<?php echo BASE_URL; ?>viewproducts.php" class="stat-card-link">
                     <i class="fas fa-tshirt icon"></i>
                     <div class="value"><?php echo $totalProducts; ?></div>
@@ -91,10 +87,10 @@ $pendingReviews = $reviewManager->getReviewCountByStatus('Pending'); // Correcte
             </div>
 
             <div class="dashboard-actions">
-                <a href="<?php echo BASE_URL; ?>addproduct.php" class="action-button primary"> <!-- Changed link -->
+                <a href="<?php echo BASE_URL; ?>addproduct.php" class="action-button primary">
                     <i class="fas fa-plus-circle"></i> Add New Product
                 </a>
-                <a href="<?php echo BASE_URL; ?>viewproducts.php" class="action-button primary"> <!-- Changed link -->
+                <a href="<?php echo BASE_URL; ?>viewproducts.php" class="action-button primary">
                     <i class="fas fa-tshirt"></i> View Products
                 </a>
                 <a href="<?php echo BASE_URL; ?>managecategory.php" class="action-button secondary">
@@ -110,23 +106,6 @@ $pendingReviews = $reviewManager->getReviewCountByStatus('Pending'); // Correcte
                     <i class="fas fa-comments"></i> Manage Reviews
                 </a>
             </div>
-
-            <!-- The example feedback section is commented out as it is static data -->
-            <!-- <div class="customer-feedback-section">
-                <h3>Customer Feedback (Example)</h3>
-                <div class="feedback-item">
-                    <p>"The bridal gown I ordered was absolutely stunning! Excellent quality and fit."</p>
-                    <div class="customer-info">- Jane Doe (Order #1001)</div>
-                </div>
-                <div class="feedback-item">
-                    <p>"Great customer service, very helpful with my queries."</p>
-                    <div class="customer-info">- John Smith</div>
-                </div>
-                <div class="feedback-item">
-                    <p>"Received my partywear dress earlier than expected. Very happy!"</p>
-                    <div class="customer-info">- Emily White (Order #1005)</div>
-                </div>
-            </div> -->
         </div>
     </div>
 </body>
