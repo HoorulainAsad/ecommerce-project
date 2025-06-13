@@ -21,7 +21,6 @@
             <div class="col-md-2 mb-3">
                 <h5>Quick Links</h5>
                 <ul class="list-unstyled">
-                    <li><a href="<?php echo BASE_URL; ?>index.php">Home</a></li>
                     <li><a href="#">About Us</a></li> <!-- Empty link -->
                     <li><a href="#">Contact Us</a></li> <!-- Empty link -->
                     <li><a href="#">FAQs</a></li> <!-- Empty link -->

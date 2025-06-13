@@ -1,14 +1,23 @@
 <?php
 // admin/classes/ProductManager.php
 
-require_once __DIR__ . '/../includes/database.php'; // Ensure this path is correct
+require_once __DIR__ . '/../includes/database.php';
 
 class ProductManager {
     private $conn;
 
     public function __construct() {
-        $this->conn = getDbConnection(); // Get the single, shared database connection
+        $this->conn = getDbConnection();
     }
+
+    // ... (rest of your ProductManager methods) ...
+
+    // IMPORTANT: Ensure this __destruct() method is ABSENT or commented out if it tries to close the connection.
+    /*
+    public function __destruct() {
+        // Do NOT close the connection here. It's managed globally.
+    }
+    */
 
     /**
      * Adds a new product to the database.
@@ -116,9 +125,6 @@ class ProductManager {
         $product = $this->getProductById($productId);
         if ($product && !empty($product['image_url'])) {
             // Construct the absolute path to the image file
-            // BASE_URL for admin is usually relative to htdocs/msgm_clothing/admin/
-            // Product image URLs are saved as 'admin/uploads/products/filename.jpg'
-            // So, from admin/, it's '../admin/uploads/products/filename.jpg'
             $imagePath = realpath(__DIR__ . '/../' . $product['image_url']);
 
             if ($imagePath && file_exists($imagePath) && is_file($imagePath)) {
@@ -187,7 +193,33 @@ class ProductManager {
         return 0;
     }
 
-    // IMPORTANT: Removed __destruct() method to prevent "mysqli object is already closed" errors.
-    // The database connection is now managed globally by admin/includes/database.php.
+    /**
+     * Retrieves products belonging to a specific category ID, with category name.
+     * @param int $categoryId The ID of the category.
+     * @return array An array of product associative arrays.
+     */
+    public function getProductsByCategoryId($categoryId) {
+        $sql = "SELECT p.id, p.name, p.description, p.price, p.stock, p.image_url, c.name AS category_name
+                FROM products p
+                JOIN categories c ON p.category_id = c.id
+                WHERE p.category_id = ?
+                ORDER BY p.name ASC";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            error_log("ProductManager::getProductsByCategoryId - Prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
+            return [];
+        }
+        $stmt->bind_param("i", $categoryId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $products = [];
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $products[] = $row;
+            }
+        }
+        $stmt->close();
+        return $products;
+    }
 }
 ?>

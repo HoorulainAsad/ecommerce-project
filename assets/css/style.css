@@ -47,6 +47,9 @@ a:hover {
 .bg-muted-gray { background-color: #b4b0ab !important; }
 
 /* Navbar Styling */
+.navbar{
+         height: 100px;
+}
 
  .navbar-custom {
             background-color: #e9e3ce; /* Dark background */
@@ -69,7 +72,7 @@ a:hover {
             align-items: center; /* Vertically centers the logo */
             padding: 0; /* Remove default padding */
             margin: 0;
-            height: 100%; /* Take full vertical space */
+            height: 100px;/* Take full vertical space */
         }
 
         .navbar-custom .navbar-brand img {
@@ -140,21 +143,25 @@ a:hover {
         }
 
         /* Responsive adjustments for smaller screens */
-        @media (max-width: 991.98px) {
+        /* @media (max-width: 991.98px) {
+            .navbar{
+                z-index: 3;
+            }
             .navbar-custom .navbar-brand img {
-                height: 80px; /* Smaller logo on smaller screens */
+                height: 80px; 
                 margin-right: 10px;
+
             }
             .navbar-custom .container-fluid {
-                padding-left: 0.5rem; /* Smaller gap on mobile */
+                padding-left: 0.5rem; 
             }
             .navbar-custom .form-control {
-                width: 100%; /* Full width search on mobile */
+                width: 100%; 
                 margin-bottom: 10px;
             }
             .navbar-custom .d-flex.me-3 {
                 width: 100%;
-                margin-right: 0 !important; /* Override default margin */
+                margin-right: 0 !important; 
             }
             .navbar-custom .btn-outline-success {
                 margin-left: 0;
@@ -170,8 +177,8 @@ a:hover {
             .navbar-custom .navbar-collapse {
                 margin-top: 10px;
             }
-        }
-
+        } 
+  */
 
 /* Hero Section */
 .hero-section {
@@ -478,10 +485,11 @@ a:hover {
 /* Responsive Adjustments */
 @media (max-width: 992px) {
     .navbar-custom .navbar-collapse {
-        background-color: #2e2e2e;
+        background-color: #e9e3ce;
         padding: 15px;
         border-radius: 8px;
         margin-top: 10px;
+        z-index: 1;
     }
     .navbar-custom .nav-link {
         margin-right: 0;

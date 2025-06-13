@@ -24,10 +24,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $conn = getDbConnection(); // Get database connection
         $sql = "SELECT id, username, password FROM admin_users WHERE username = ?";
         $stmt = $conn->prepare($sql);
+        
         if ($stmt) {
             $stmt->bind_param("s", $username);
             $stmt->execute();
             $result = $stmt->get_result();
+            
             if ($result->num_rows === 1) {
                 $user = $result->fetch_assoc();
                 // Verify the hashed password
@@ -35,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION[ADMIN_SESSION_KEY] = true;
                     $_SESSION[ADMIN_USERNAME_SESSION_KEY] = $user['username'];
                     $stmt->close();
-                    $conn->close();
+                    // No need to close connection - shutdown function will handle it
                     redirectTo('index.php'); // Redirect to dashboard on successful login
                 } else {
                     $message = "Invalid username or password.";
@@ -50,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = "Database error: " . $conn->error;
             $error = true;
         }
-        $conn->close();
+        // No need to close connection here - shutdown function will handle it
     }
 }
 ?>
@@ -63,8 +65,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://fonts.googleapis.com/css2?family=Anonymous+Pro:ital,wght@0,400;0,700;1,400;1,700&family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     <!-- Link to your external stylesheet -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/styles.css">
+    
 </head>
-<body class="login-body"> <!-- ADDED THIS CLASS HERE -->
+<body class="login-body">
     <div class="login-container">
         <h2>Admin Login</h2>
         <?php if ($message): ?>

@@ -12,17 +12,19 @@ static $conn_instance = null;
 
 /**
  * Establishes and returns a new database connection (or returns the existing one).
+ * This function ensures only one mysqli connection object is created per script execution.
  * @return mysqli The database connection object.
  */
 function getDbConnection() {
     global $conn_instance; // Access the static variable in the global scope
 
-    // If connection instance already exists and is not null, return it
+    // If connection instance already exists, check if it's still alive.
+    // If it's an instance of mysqli and still pings successfully, return it.
     if ($conn_instance instanceof mysqli && $conn_instance->ping()) {
         return $conn_instance;
     }
 
-    // Otherwise, create a new connection
+    // If connection is not active or doesn't exist, create a new one
     $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
     // Check connection
@@ -35,7 +37,7 @@ function getDbConnection() {
     // Set charset for proper data handling
     $conn->set_charset("utf8mb4");
 
-    // Store the new connection instance
+    // Store the new connection instance globally
     $conn_instance = $conn;
 
     return $conn_instance;
@@ -43,18 +45,22 @@ function getDbConnection() {
 
 /**
  * Explicitly closes the global database connection.
- * Call this once at the very end of your script if you need to.
+ * This function is registered to run at script shutdown.
  */
 function closeDbConnection() {
     global $conn_instance;
-    if ($conn_instance instanceof mysqli && $conn_instance->ping()) {
-        $conn_instance->close();
-        $conn_instance = null; // Reset the instance
+
+    if ($conn_instance instanceof mysqli) {
+        try {
+            $conn_instance->close();
+        } catch (Exception $e) {
+            // Connection is already closed
+            error_log("Connection cleanup error: " . $e->getMessage());
+        }
     }
+    $conn_instance = null;
 }
 
-// Optional: Register closeDbConnection to run at script shutdown
-// This is generally a good practice for web requests.
+// Always register cleanup function to run at script shutdown
 register_shutdown_function('closeDbConnection');
-
 ?>

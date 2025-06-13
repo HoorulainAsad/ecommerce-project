@@ -10,18 +10,14 @@ class UserManager {
         $this->conn = getDbConnection();
     }
 
-    /**
-     * Retrieves the total count of registered users.
-     * @return int The total number of users.
-     */
-    public function getTotalUsersCount() {
-        $sql = "SELECT COUNT(id) AS total_users FROM users"; // Assuming 'users' is your frontend user table
-        $result = $this->conn->query($sql);
-        if ($result && $row = $result->fetch_assoc()) {
-            return (int)$row['total_users'];
-        }
-        return 0;
+    // ... (rest of your UserManager methods) ...
+
+    // IMPORTANT: Ensure this __destruct() method is ABSENT or commented out if it tries to close the connection.
+    /*
+    public function __destruct() {
+        // Do NOT close the connection here. It's managed globally.
     }
+    */
 
     /**
      * Retrieves all users from the database.
@@ -39,6 +35,17 @@ class UserManager {
         return $users;
     }
 
-    // No __destruct() here, as database connection is handled globally.
+    /**
+     * Gets the total count of registered users.
+     * @return int The total number of users.
+     */
+    public function getTotalUsersCount() {
+        $sql = "SELECT COUNT(id) AS total_users FROM users"; // Assuming 'users' is your frontend user table
+        $result = $this->conn->query($sql);
+        if ($result && $row = $result->fetch_assoc()) {
+            return (int)$row['total_users'];
+        }
+        return 0;
+    }
 }
 ?>

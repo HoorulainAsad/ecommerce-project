@@ -10,6 +10,15 @@ class ReviewManager {
         $this->conn = getDbConnection();
     }
 
+    // ... (rest of your ReviewManager methods) ...
+
+    // IMPORTANT: Ensure this __destruct() method is ABSENT or commented out if it tries to close the connection.
+    /*
+    public function __destruct() {
+        // Do NOT close the connection here. It's managed globally.
+    }
+    */
+
     /**
      * Retrieves all reviews, optionally filtered by status.
      * @param string $statusFilter 'all', 'pending', 'approved', 'rejected'.
@@ -114,15 +123,5 @@ class ReviewManager {
         $stmt->close();
         return 0;
     }
-
-    /**
-     * Retrieves the count of pending reviews. (Legacy, use getReviewCountByStatus('Pending'))
-     * @return int The number of pending reviews.
-     */
-    public function getPendingReviewCount() {
-        return $this->getReviewCountByStatus('Pending');
-    }
-
-    // No __destruct() here, as database connection is handled globally.
 }
 ?>
