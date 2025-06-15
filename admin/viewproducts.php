@@ -140,7 +140,7 @@ if ($filter === 'new_arrivals') {
                             <tr>
                                 <td data-label="Image">
                                     <?php if (!empty($product['image_url'])): ?>
-                                        <img src="<?php echo BASE_URL . htmlspecialchars($product['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="product-image-thumb" onerror="this.onerror=null;this.src='https://placehold.co/80x80/E0E0E0/555555?text=No+Image';">
+                                        <img src="<?php echo WEB_ROOT_URL . htmlspecialchars($product['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="product-image-thumb" onerror="this.onerror=null;this.src='https://placehold.co/80x80/E0E0E0/555555?text=No+Image';">
                                     <?php else: ?>
                                         <img src="https://placehold.co/80x80/E0E0E0/555555?text=No+Image" alt="No Image" class="product-image-thumb">
                                     <?php endif; ?>

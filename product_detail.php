@@ -1,10 +1,10 @@
 <?php
-// product_detail.php (Product Detail Page)
-
-require_once __DIR__ . '/includes/header.php'; // Includes functions.php and starts session
+require_once __DIR__ . '/includes/header.php';
 require_once __DIR__ . '/classes/ProductFrontendManager.php';
+require_once __DIR__ . '/classes/CartManager.php';
 
 $productManager = new ProductFrontendManager();
+$cartManager = new CartManager();
 
 $productId = filter_var($_GET['id'] ?? 0, FILTER_VALIDATE_INT);
 $product = null;
@@ -22,27 +22,23 @@ if ($productId > 0) {
     $message_type = 'error';
 }
 
-// Handle Add to Cart submission (basic, no actual cart logic yet)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     if ($product && !$product['is_out_of_stock']) {
-        // In a real application, you'd add this product to a session-based cart
-        // or a database cart for logged-in users.
-        // For now, let's simulate a success message.
         $selectedSize = sanitizeInput($_POST['size'] ?? 'N/A');
-        $message = htmlspecialchars($product['name']) . " (Size: " . $selectedSize . ") added to cart! (This is a simulation)";
-        $message_type = 'success';
-        // You might redirect to the cart page here: redirectTo('cart.php');
-    } else if ($product && $product['is_out_of_stock']) {
-        $message = "Cannot add " . htmlspecialchars($product['name']) . " to cart, it is out of stock.";
-        $message_type = 'error';
+        $added = $cartManager->addToCart($productId, 1, $selectedSize);
+        if ($added) {
+            $message = htmlspecialchars($product['name']) . " (Size: " . $selectedSize . ") added to cart!";
+            $message_type = 'success';
+        } else {
+            $message = "Failed to add product to cart.";
+            $message_type = 'error';
+        }
     } else {
-        $message = "Invalid product or action.";
+        $message = "Product is not available.";
         $message_type = 'error';
     }
 }
-
 ?>
-
 <div class="container-fluid container-xl py-5 page-content">
     <?php if ($message): ?>
         <div class="row mb-4">
@@ -139,6 +135,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     </div>
 </div>
 
-<?php
-require_once __DIR__ . '/includes/footer.php';
-?>
+<!-- Your HTML UI below (same as your code above)... -->
+<!-- ... -->
+<?php require_once __DIR__ . '/includes/footer.php'; ?>

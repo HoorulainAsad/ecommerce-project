@@ -6,7 +6,7 @@
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');    // Your MySQL username (default for XAMPP)
 define('DB_PASS', '');        // Your MySQL password (default for XAMPP is empty)
-define('DB_NAME', 'msgm_database'); // Your database name
+define('DB_NAME', 'msgm_database'); // Your database names
 
 /**
  * Establishes and returns a new database connection.
