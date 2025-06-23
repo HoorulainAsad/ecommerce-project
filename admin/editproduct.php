@@ -7,7 +7,7 @@ require_once __DIR__ . '/classes/CategoryManager.php';
 
 // Check if admin is logged in
 if (!isLoggedIn()) {
-    redirectTo('login.php');
+    redirectToAdmin('login.php');
 }
 
 $productManager = new ProductManager();
@@ -134,7 +134,7 @@ $categoriesForDropdown = array_filter($allCategories, function($cat) use ($main_
     <title>Edit Product - MSGM Bridal Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Anonymous+Pro:ital,wght@0,400;0,700;1,400;1,700&family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/styles.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>admin/assets/css/styles.css">
 </head>
 <body>
     <div class="admin-wrapper">
@@ -195,9 +195,10 @@ $categoriesForDropdown = array_filter($allCategories, function($cat) use ($main_
                             </div>
                         <?php endif; ?>
                     </div>
-
+                            <div class="edit-product-buttons">
                     <button type="submit" class="submit-btn">Update Product</button>
-                    <a href="<?php echo BASE_URL; ?>viewproducts.php" class="submit-btn" style="background-color: #6c757d; margin-left: 10px; text-decoration: none;">Cancel</a>
+                    <a href="<?php echo BASE_URL; ?>admin/viewproducts.php" class="submit-btn" style="background-color: #6c757d; margin-left: 10px; text-decoration: none;">Cancel</a>
+                    </div>
                 </form>
             </div>
         </div>

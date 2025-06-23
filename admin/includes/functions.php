@@ -1,9 +1,17 @@
 <?php
-// admin/includes/functions.php
+// C:\xampp\htdocs\msgm_clothing\admin\includes\functions.php
 
-require_once __DIR__ . '/config.php'; // For ADMIN_SESSION_KEY and BASE_URL
+// 1. Load the central configuration file FIRST.
+// This ensures all constants like ADMIN_SESSION_KEY, BASE_URL, WEB_ROOT_URL are available.
+require_once __DIR__ . '/config.php';
 
-// Start session if not already started
+// 2. Load the database connection handler (which itself loads config.php).
+// This makes getDbConnection() available.
+require_once __DIR__ . '/database.php';
+
+
+// Session start is handled in config.php now, so it's not strictly needed here,
+// but leaving the check is harmless if config.php isn't always the first file loaded.
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
@@ -22,15 +30,24 @@ function sanitizeInput($data) {
 
 /**
  * Redirects the user to a specified location.
- * @param string $location The URL to redirect to.
+ * Uses WEB_ROOT_URL for absolute paths, which is best for redirects.
+ * @param string $location The URL to redirect to (relative path after WEB_ROOT_URL).
  */
 function redirectTo($location) {
     header("Location: " . BASE_URL . $location);
     exit();
 }
 
+function redirectToAdmin($location) {
+    // Assuming admin specific pages are always under /msgm_clothing/admin/
+    // and $location is something like 'login.php' or 'viewproducts.php'
+    header("Location: " . BASE_URL . "admin/" . $location);
+    exit();
+}
+
 /**
  * Checks if an admin user is currently logged in.
+ * Relies on ADMIN_SESSION_KEY being defined in config.php.
  * @return bool True if logged in, false otherwise.
  */
 function isLoggedIn() {
@@ -43,11 +60,10 @@ function isLoggedIn() {
  * @param string $type The type of message (e.g., 'success', 'error', 'info').
  */
 function displayMessage($message, $type = 'info') {
-    // You can enhance this to use session flashes or a more complex modal system.
-    // For now, it's a simple echo.
     echo "<div class='message-box message-box-$type'>";
     echo htmlspecialchars($message) . "</div>";
 }
+
 
 // Add this JavaScript at the end of functions.php for mobile sidepanel toggle
 ?>

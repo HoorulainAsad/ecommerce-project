@@ -1,18 +1,45 @@
 <?php
 require_once __DIR__ . '/classes/CartManager.php';
-
-$cartManager = new CartManager();
+require_once __DIR__ . '/includes/functions.php'; // Assuming this has redirectTo and displayMessage
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'] ?? '';
-    $cartId = intval($_POST['cart_id'] ?? 0);
+    $cartManager = new CartManager();
 
-    if ($action === 'increase' || $action === 'decrease') {
-        $cartManager->updateQuantity($cartId, $action);
-    } elseif ($action === 'delete') {
-        $cartManager->deleteItem($cartId);
+    $cartId = filter_var($_POST['cart_id'] ?? 0, FILTER_VALIDATE_INT);
+    $action = sanitizeInput($_POST['action'] ?? '');
+
+    if ($cartId > 0) {
+        $success = false;
+        if ($action === 'increase' || $action === 'decrease') {
+            $success = $cartManager->updateQuantity($cartId, $action);
+        } elseif ($action === 'delete') {
+            $success = $cartManager->deleteItem($cartId);
+        } elseif ($action === 'update_checked_status') { // NEW ACTION
+            $isChecked = isset($_POST['is_checked']) && $_POST['is_checked'] === 'true'; // Get boolean from JS
+            $success = $cartManager->updateItemCheckedStatus($cartId, $isChecked);
+        }
+
+        if ($action === 'update_checked_status' || $action === 'increase' || $action === 'decrease' || $action === 'delete') {
+            // For AJAX requests, send JSON response
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => $success,
+                'grand_total' => number_format($cartManager->getCheckedCartTotal(), 2) // Send updated total
+            ]);
+            exit; // Stop script execution after sending JSON
+        }
+
+        // For non-AJAX requests (like the existing quantity forms)
+        if ($success) {
+            displayMessage("Cart updated successfully.", "success");
+        } else {
+            displayMessage("Failed to update cart.", "error");
+        }
+    } else {
+        displayMessage("Invalid cart item.", "error");
     }
-}
 
-header('Location: cart.php');
-exit;
+    redirectTo('cart.php'); // Redirect after processing, for non-AJAX
+} else {
+    redirectTo('cart.php'); // Redirect if not a POST request
+}

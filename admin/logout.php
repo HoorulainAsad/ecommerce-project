@@ -10,5 +10,5 @@ $_SESSION = array();
 session_destroy();
 
 // Redirect to the login page
-redirectTo('login.php');
+redirectToAdmin('login.php');
 ?>

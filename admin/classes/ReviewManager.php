@@ -1,23 +1,67 @@
 <?php
-// admin/classes/ReviewManager.php
+// C:\xampp\htdocs\msgm_clothing\classes\ReviewManager.php
 
-require_once __DIR__ . '/../includes/database.php';
+require_once __DIR__ . '/../includes/database.php'; // Correct path to your database.php
 
 class ReviewManager {
     private $conn;
 
     public function __construct() {
         $this->conn = getDbConnection();
+        if (!$this->conn) {
+            throw new Exception("ReviewManager: Could not establish database connection.");
+        }
     }
 
-    // ... (rest of your ReviewManager methods) ...
+    /**
+     * Adds a new customer review.
+     * @param int $orderId The ID of the order this review is for.
+     * @param string $customerName The name of the customer.
+     * @param int $rating The star rating (1-5).
+     * @param string $comment The review comment.
+     * @param string|null $customerEmail Optional: The email of the customer.
+     * @param int|null $userId Optional: The ID of the registered user.
+     * @param int|null $productId Optional: The ID of the product being reviewed.
+     * @return bool True on success, false on failure.
+     */
+    public function addReview($orderId, $customerName, $rating, $comment, $customerEmail = null, $userId = null, $productId = null) {
+        $sql = "INSERT INTO reviews (order_id, product_id, customer_name, rating, comment, customer_email, user_id, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
 
-    // IMPORTANT: Ensure this __destruct() method is ABSENT or commented out if it tries to close the connection.
-    /*
-    public function __destruct() {
-        // Do NOT close the connection here. It's managed globally.
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            error_log("ReviewManager: Prepare failed to add review: (" . $this->conn->errno . ") " . $this->conn->error);
+            return false;
+        }
+
+        // Note: Check your 'reviews' table columns. If 'user_id' or 'product_id' are not nullable
+        // and you're passing null, it might cause issues.
+        // Assuming 'i' for order_id, 'i' for product_id, 's' for customer_name, 'i' for rating,
+        // 's' for comment, 's' for customer_email, 'i' for user_id.
+        $stmt->bind_param("iisisss", $orderId, $productId, $customerName, $rating, $comment, $customerEmail, $userId);
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
     }
-    */
+
+    /**
+     * Updates the status of a review.
+     * @param int $reviewId The ID of the review.
+     * @param string $newStatus The new status ('approved', 'rejected', 'pending').
+     * @return bool True on success, false on failure.
+     */
+    public function updateReviewStatus($reviewId, $newStatus) {
+        $sql = "UPDATE reviews SET status = ? WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            error_log("ReviewManager: Prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
+            return false;
+        }
+        $stmt->bind_param("si", $newStatus, $reviewId);
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
+    }
 
     /**
      * Retrieves all reviews, optionally filtered by status.
@@ -64,26 +108,30 @@ class ReviewManager {
     }
 
     /**
-     * Updates the status of a review.
-     * @param int $reviewId The ID of the review.
-     * @param string $newStatus The new status ('approved', 'rejected', 'pending').
-     * @return bool True on success, false on failure.
+     * Gets the count of reviews by status.
+     * @param string $status The status to count (e.g., 'pending', 'approved').
+     * @return int The total number of reviews with that status.
      */
-    public function updateReviewStatus($reviewId, $newStatus) {
-        $sql = "UPDATE reviews SET status = ?, updated_at = NOW() WHERE id = ?";
+    public function getReviewCountByStatus($status = 'pending') {
+        $sql = "SELECT COUNT(*) as total FROM reviews WHERE status = ?";
         $stmt = $this->conn->prepare($sql);
         if (!$stmt) {
-            error_log("ReviewManager: Prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
-            return false;
+            error_log("ReviewManager: Failed to prepare getReviewCountByStatus: " . $this->conn->error);
+            return 0;
         }
-        $stmt->bind_param("si", $newStatus, $reviewId);
-        $result = $stmt->execute();
+
+        $stmt->bind_param("s", $status);
+        $stmt->execute();
+        $stmt->bind_result($total);
+        $stmt->fetch();
         $stmt->close();
-        return $result;
+
+        return $total;
     }
 
     /**
-     * Deletes a review.
+     * Deletes a review from the database.
+     * THIS IS THE MISSING METHOD!
      * @param int $reviewId The ID of the review to delete.
      * @return bool True on success, false on failure.
      */
@@ -91,37 +139,13 @@ class ReviewManager {
         $sql = "DELETE FROM reviews WHERE id = ?";
         $stmt = $this->conn->prepare($sql);
         if (!$stmt) {
-            error_log("ReviewManager: Prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
+            error_log("ReviewManager: Prepare failed to delete review: (" . $this->conn->errno . ") " . $this->conn->error);
             return false;
         }
         $stmt->bind_param("i", $reviewId);
         $result = $stmt->execute();
         $stmt->close();
         return $result;
-    }
-
-    /**
-     * Retrieves the count of reviews by a specific status.
-     * @param string $status The status to count (e.g., 'pending', 'approved', 'rejected').
-     * @return int The number of reviews with the given status.
-     */
-    public function getReviewCountByStatus($status) {
-        $sql = "SELECT COUNT(*) AS count FROM reviews WHERE status = ?";
-        $stmt = $this->conn->prepare($sql);
-        if (!$stmt) {
-            error_log("ReviewManager: Prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
-            return 0;
-        }
-        $stmt->bind_param("s", $status);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result) {
-            $row = $result->fetch_assoc();
-            $stmt->close();
-            return $row['count'];
-        }
-        $stmt->close();
-        return 0;
     }
 }
 ?>

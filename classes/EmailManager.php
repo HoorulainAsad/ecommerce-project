@@ -1,104 +1,317 @@
 <?php
 // classes/EmailManager.php
 
+// ⚠️ IMPORTANT: Adjust these paths if you are not using Composer
+// If you downloaded PHPMailer manually, make sure these paths correctly point to your PHPMailer installation.
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\SMTP;
+
+require_once __DIR__ . '/../libs/PHPMailer/src/Exception.php';
+require_once __DIR__ . '/../libs/PHPMailer/src/PHPMailer.php';
+require_once __DIR__ . '/../libs/PHPMailer/src/SMTP.php';
+
+// IMPORTANT: Ensure your admin/includes/config.php is accessible and defines WEB_ROOT_URL.
+// This is crucial for correctly forming links in emails (e.g., review links).
+require_once __DIR__ . '/../admin/includes/config.php';
+
 class EmailManager {
 
-    /**
-     * Sends an order confirmation email to the customer.
-     * @param string $recipientEmail The email address of the customer.
-     * @param array $orderDetails An associative array containing all order details, including the 'items' array.
-     * @return bool True if the email was successfully accepted for delivery by the local mail server, false otherwise.
-     */
-    public function sendOrderConfirmationEmail($recipientEmail, $orderDetails) {
-        // Subject of the email
-        $subject = "Order Confirmation - MSGM Bridal #" . $orderDetails['id'];
+    // --- Private Helper Methods for Email Structure Consistency ---
 
-        // Build the HTML message for the email
-        $message = "
+    /**
+     * Generates the common HTML header for all emails.
+     * @param string $subject The subject of the email for the <title> tag.
+     * @return string HTML string for the email header.
+     */
+    private function getCommonEmailHeader($subject) {
+        return "
         <html>
         <head>
-            <title>Order Confirmation - MSGM Bridal</title>
+            <meta charset='utf-8'>
+            <title>" . htmlspecialchars($subject) . "</title>
             <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 20px auto; border: 1px solid #ddd; border-radius: 8px; padding: 20px; background-color: #f9f9f9; }
-                h2 { color: #7f0e10; }
-                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
-                th { background-color: #e9e3ce; color: #2e2e2e; }
-                .total { font-weight: bold; color: #7f0e10; }
-                .footer { margin-top: 30px; font-size: 0.9em; color: #666; text-align: center; }
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f4f4; }
+                .container { max-width: 600px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+                .header { background: #7f0e10; /* Your brand color */ color: #fff; padding: 10px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+                .content { padding: 20px 0; }
+                .footer { text-align: center; font-size: 0.8em; color: #666; margin-top: 20px; padding-top: 10px; border-top: 1px solid #eee; }
+                .button { display: inline-block; padding: 10px 20px; margin-top: 15px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 5px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; }
+                .total-row { font-weight: bold; background-color: #e9e3ce; }
             </style>
         </head>
         <body>
             <div class='container'>
-                <h2>Thank you for your order, " . htmlspecialchars($orderDetails['customer_name']) . "!</h2>
-                <p>Your order #<strong>" . htmlspecialchars($orderDetails['id']) . "</strong> has been placed successfully and is currently <strong>" . htmlspecialchars($orderDetails['order_status']) . "</strong>.</p>
-                <p>We'll send you another email when your order ships.</p>
+                <div class='header'>
+                    <h2>MSGM Bridal</h2>
+                </div>
+                <div class='content'>"; // Closes with '</div>' in getCommonEmailFooter()
+    }
 
-                <h3>Order Details:</h3>
-                <p><strong>Order Date:</strong> " . date('F j, Y, g:i a', strtotime($orderDetails['created_at'])) . "</p>
-                <p><strong>Order Total:</strong> $" . htmlspecialchars(number_format($orderDetails['order_total'], 2)) . "</p>
-                <p><strong>Payment Method:</strong> " . htmlspecialchars($orderDetails['payment_method']) . "</p>
-
-                <h3>Shipping Address:</h3>
-                <p>
-                    " . htmlspecialchars($orderDetails['customer_name']) . "<br>
-                    " . htmlspecialchars($orderDetails['shipping_address']) . "<br>
-                    " . htmlspecialchars($orderDetails['city']) . ", " . htmlspecialchars($orderDetails['postal_code']) . "<br>
-                    Phone: " . htmlspecialchars($orderDetails['customer_phone']) . "
-                </p>
-
-                <h3>Items in Your Order:</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Product</th>
-                            <th>Size</th>
-                            <th>Quantity</th>
-                            <th>Price</th>
-                            <th>Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>";
-        foreach ($orderDetails['items'] as $item) {
-            $message .= "
-                        <tr>
-                            <td>" . htmlspecialchars($item['product_name']) . "</td>
-                            <td>" . htmlspecialchars($item['size']) . "</td>
-                            <td>" . htmlspecialchars(number_format($item['quantity'])) . "</td>
-                            <td>$" . htmlspecialchars(number_format($item['price'], 2)) . "</td>
-                            <td>$" . htmlspecialchars(number_format($item['quantity'] * $item['price'], 2)) . "</td>
-                        </tr>";
-        }
-        $message .= "
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan='4' style='text-align: right;' class='total'>Order Total:</td>
-                            <td class='total'>$" . htmlspecialchars(number_format($orderDetails['order_total'], 2)) . "</td>
-                        </tr>
-                    </tfoot>
-                </table>
-
-                <p class='footer'>
-                    If you have any questions, please contact us at support@msgmbridal.com.<br>
-                    Thank you for shopping with MSGM Bridal!
-                </p>
-            </div>
+    /**
+     * Generates the common HTML footer for all emails.
+     * @return string HTML string for the email footer.
+     */
+    private function getCommonEmailFooter() {
+        return "
+                </div><!-- .content -->
+                <div class='footer'>
+                    <p>&copy; " . date('Y') . " MSGM Bridal. All rights reserved.</p>
+                    <p>If you have any questions, please contact us at support@msgmbridal.com</p>
+                </div>
+            </div><!-- .container -->
         </body>
-        </html>
-        ";
+        </html>";
+    }
 
-        // Headers for HTML email
-        $headers = "MIME-Version: 1.0" . "\r\n";
-        $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-        $headers .= 'From: MSGM Bridal <noreply@yourdomain.com>' . "\r\n"; // IMPORTANT: Replace 'noreply@yourdomain.com' with a valid email address that exists on your server or SMTP configuration. Otherwise, emails might not send or go to spam.
+    // --- PHPMailer Integration ---
 
-        // Attempt to send the email
-        // Note: For mail() to work, your PHP environment must be configured for email sending (e.g., sendmail on Linux, or SMTP settings in php.ini for Windows).
-        // If it doesn't work, this function will return false, but won't throw an error directly.
-        // For production, use a dedicated email library like PHPMailer or a transactional email service.
-        return mail($recipientEmail, $subject, $message, $headers);
+    /**
+     * Private helper function to configure and send email using PHPMailer.
+     * @param string $recipientEmail The email address of the recipient.
+     * @param string $subject The subject line of the email.
+     * @param string $body The HTML body of the email.
+     * @return bool True on success, false on failure.
+     */
+    private function sendEmailWithPHPMailer($recipientEmail, $subject, $body) {
+        $mail = new PHPMailer(true); // Enable exceptions for better error handling
+
+        try {
+            // Server settings (🚨 REPLACE WITH YOUR ACTUAL SMTP CREDENTIALS 🚨)
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'hoorulainasad583@gmail.com';
+            $mail->Password   = 'aoscxvtbcnibfotm'; // Use an App Password for Gmail
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // or PHPMailer::ENCRYPTION_SMTPS for SSL on 465
+            $mail->Port       = 587; // or 465 for SSL
+
+            // Optional: For debugging purposes. Set to 0 in production.
+            // $mail->SMTPDebug = SMTP::DEBUG_SERVER; // Shows SMTP interaction (useful for debugging)
+
+            // Recipients
+            // 🚨 IMPORTANT: 'From' email should often be a verified sender in your SMTP service 🚨
+            $mail->setFrom('hoorulainasad583@gmail.com', 'MSGM Bridal'); // Your store's email address and name
+            $mail->addAddress($recipientEmail); // Add the recipient's email address
+
+            // Content
+            $mail->isHTML(true); // Set email format to HTML
+            $mail->Subject = $subject;
+            $mail->Body    = $body;
+            $mail->AltBody = strip_tags($body); // Plain-text alternative
+
+            $mail->send();
+            return true; // Email sent successfully
+        } catch (Exception $e) {
+            // Log the error for debugging purposes (e.g., to a file or error tracking service)
+            error_log("Message could not be sent to {$recipientEmail}. Mailer Error: {$mail->ErrorInfo}");
+            return false;
+        }
+    }
+
+    // --- Public Email Sending Methods ---
+
+    /**
+     * Sends an order confirmation email to the customer.
+     *
+     * @param string $recipientEmail The customer's email address.
+     * @param array $orderDetails An associative array containing full order details.
+     * Expected keys: 'id', 'customer_name', 'order_status', 'created_at', 'payment_method',
+     * 'total_amount', 'shipping_address', 'city', 'postal_code', 'customer_phone' (optional),
+     * and 'items' (array of product details with 'name', 'quantity', 'price').
+     * @return bool True on success, false on failure.
+     */
+    public function sendOrderConfirmationEmail($recipientEmail, $orderDetails) {
+        $subject = "Order Confirmation - MSGM Bridal #" . htmlspecialchars($orderDetails['id']);
+
+        // Start building the email body using common header
+        $messageBody = $this->getCommonEmailHeader($subject);
+
+        // Specific content for order confirmation
+        $messageBody .= "
+            <p>Dear " . htmlspecialchars($orderDetails['customer_name']) . ",</p>
+            <p>Thank you for your order with MSGM Bridal!</p>
+            <p>Your order #<strong>" . htmlspecialchars($orderDetails['id']) . "</strong> has been placed successfully and is currently <strong>" . htmlspecialchars(ucfirst($orderDetails['order_status'])) . "</strong>.</p>
+            <p>We'll send you another email when your order ships.</p>
+
+            <h3>Order Details:</h3>
+            <p><strong>Order Date:</strong> " . date('F j, Y, g:i a', strtotime($orderDetails['created_at'])) . "</p>
+            <p><strong>Payment Method:</strong> " . htmlspecialchars(strtoupper($orderDetails['payment_method'])) . "</p>
+
+            <h3>Items in Your Order:</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>";
+
+        // Loop through order items
+        if (isset($orderDetails['items']) && is_array($orderDetails['items'])) {
+            foreach ($orderDetails['items'] as $item) {
+                $productName = htmlspecialchars($item['name'] ?? 'N/A');
+                $quantity = htmlspecialchars($item['quantity'] ?? 0);
+                $price = number_format($item['price'] ?? 0, 2);
+                $subtotal = number_format(($item['quantity'] ?? 0) * ($item['price'] ?? 0), 2);
+
+                $messageBody .= "
+                        <tr>
+                            <td>{$productName}</td>
+                            <td>{$quantity}</td>
+                            <td>PKR {$price}</td>
+                            <td>PKR {$subtotal}</td>
+                        </tr>";
+            }
+        } else {
+             $messageBody .= "<tr><td colspan='4'>No items found for this order.</td></tr>";
+        }
+
+
+        $messageBody .= "
+                </tbody>
+                <tfoot>
+                    <tr class='total-row'>
+                        <td colspan='3' style='text-align: right;'><strong>Order Total:</strong></td>
+                        <td><strong>PKR " . number_format($orderDetails['total_amount'] ?? 0, 2) . "</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <h3>Shipping Information:</h3>
+            <p>
+                " . htmlspecialchars($orderDetails['customer_name']) . "<br>
+                " . htmlspecialchars($orderDetails['shipping_address']) . "<br>
+                " . htmlspecialchars($orderDetails['city']) . ", " . htmlspecialchars($orderDetails['postal_code']) . "<br>";
+                if (isset($orderDetails['customer_phone'])):
+                    $messageBody .= "Phone: " . htmlspecialchars($orderDetails['customer_phone']);
+                endif;
+        $messageBody .= "</p>
+            <p>You can track your order status by logging into your account or by visiting <a href=\"" . WEB_ROOT_URL . "track_order.php?order_id=" . htmlspecialchars($orderDetails['id']) . "\">this link</a>.</p>";
+
+        // End building the email body with common footer
+        $messageBody .= $this->getCommonEmailFooter();
+
+        return $this->sendEmailWithPHPMailer($recipientEmail, $subject, $messageBody);
+    }
+
+    /**
+     * Sends an order status update email to the customer.
+     *
+     * @param string $recipientEmail The customer's email address.
+     * @param array $orderDetails An associative array containing full order details.
+     * Expected keys: 'id', 'customer_name', 'order_status', 'items' (array of product details with 'product_id', 'name', 'price').
+     * @return bool True on success, false on failure.
+     */
+    public function sendOrderStatusUpdateEmail($recipientEmail, $orderDetails) {
+        // Ensure $orderDetails is an array and has necessary keys to prevent errors
+        if (!is_array($orderDetails) || !isset($orderDetails['id'], $orderDetails['order_status'])) {
+            error_log("sendOrderStatusUpdateEmail: Missing or invalid order details array.");
+            return false;
+        }
+
+        $subject = "Order Status Updated - MSGM Bridal #" . htmlspecialchars($orderDetails['id']);
+
+        // Start building the email body using common header
+        $messageBody = $this->getCommonEmailHeader($subject);
+
+        // Specific content for order status update
+        $messageBody .= "
+            <p>Dear " . htmlspecialchars($orderDetails['customer_name'] ?? 'Customer') . ",</p>
+            <p>Your order #<strong>" . htmlspecialchars($orderDetails['id']) . "</strong> status has been updated to: <span style='color:#7f0e10; font-weight: bold;'>" . htmlspecialchars(ucfirst($orderDetails['order_status'])) . "</span></p>
+
+            <p>You can expect further updates soon. Thank you for shopping with MSGM Bridal.</p>";
+
+        // Only display review section if the order is delivered
+        if (isset($orderDetails['order_status']) && strtolower($orderDetails['order_status']) === 'delivered') {
+            $messageBody .= "
+            <h3>Review Your Items:</h3>
+            <p>We'd love to hear your feedback on the products you received!</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Review</th>
+                    </tr>
+                </thead>
+                <tbody>";
+
+            // Loop through order items to generate review link for each
+            // Ensure 'items' key exists and is an array before looping
+            if (isset($orderDetails['items']) && is_array($orderDetails['items']) && !empty($orderDetails['items'])) {
+                foreach ($orderDetails['items'] as $item) {
+                    $productId = htmlspecialchars($item['product_id'] ?? '');
+                    $productName = htmlspecialchars($item['name'] ?? 'N/A');
+                    $price = number_format($item['price'] ?? 0, 2);
+
+                    // Construct the review link for EACH product
+                    // Make sure WEB_ROOT_URL is defined (e.g., from admin/includes/config.php)
+                    global $WEB_ROOT_URL; // Access the global WEB_ROOT_URL constant
+                    $reviewLink = ($WEB_ROOT_URL ?? 'http://192.168.100.14/msgm_clothing/') . "review_submission.php?order_id=" . htmlspecialchars($orderDetails['id']) . "&product_id={$productId}";
+
+                    $messageBody .= "
+                        <tr>
+                            <td>{$productName}</td>
+                            <td>PKR {$price}</td>
+                            <td>
+                                <a href='{$reviewLink}'
+                                   style='display: inline-block; padding: 8px 15px; background-color: #7f0e10; color: #fff; text-decoration: none; border-radius: 5px; font-size: 0.9em;'>
+                                    Leave a Review
+                                </a>
+                            </td>
+                        </tr>";
+                }
+            } else {
+                $messageBody .= "<tr><td colspan='3'>No items found for review.</td></tr>";
+            }
+
+            $messageBody .= "
+                </tbody>
+            </table>";
+        }
+
+        // End building the email body with common footer
+        $messageBody .= $this->getCommonEmailFooter();
+
+        // Call the private PHPMailer sending function
+        return $this->sendEmailWithPHPMailer($recipientEmail, $subject, $messageBody);
+    }
+
+    /**
+     * You can add other email sending methods here, e.g., for cancellation, password reset, etc.
+     * This method is also updated to use the common header/footer.
+     * @param string $recipientEmail
+     * @param array $orderDetails Expected to contain 'id', 'customer_name', 'reason'
+     * @return bool
+     */
+    public function sendOrderCancellationEmail($recipientEmail, $orderDetails) {
+        // Ensure $orderDetails is an array and has necessary keys
+        if (!is_array($orderDetails) || !isset($orderDetails['id'], $orderDetails['customer_name'], $orderDetails['reason'])) {
+            error_log("sendOrderCancellationEmail: Missing or invalid order details for cancellation.");
+            return false;
+        }
+
+        $subject = "Order Cancellation - MSGM Bridal #" . htmlspecialchars($orderDetails['id']);
+
+        // Start building the email body using common header
+        $messageBody = $this->getCommonEmailHeader($subject);
+
+        $messageBody .= "
+            <p>Dear " . htmlspecialchars($orderDetails['customer_name']) . ",</p>
+            <p>We regret to inform you that your order with ID <strong>#" . htmlspecialchars($orderDetails['id']) . "</strong> has been cancelled.</p>
+            <p><strong>Reason for Cancellation:</strong> " . htmlspecialchars($orderDetails['reason']) . "</p>
+            <p>If you have any questions or would like to re-place your order, please contact us.</p>";
+
+        // End building the email body with common footer
+        $messageBody .= $this->getCommonEmailFooter();
+
+        return $this->sendEmailWithPHPMailer($recipientEmail, $subject, $messageBody);
     }
 }
-?>

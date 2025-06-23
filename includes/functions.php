@@ -1,18 +1,20 @@
 <?php
-// includes/functions.php (Frontend Functions)
+// C:\xampp\htdocs\msgm_clothing\includes\functions.php (Frontend Functions)
 
 // Ensure session is started for all pages
 // This MUST be the very first thing in this file, with no whitespace before <?php
+// Session start is now handled in admin/includes/config.php, but this check is harmless.
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Define BASE_URL for consistent paths (important for assets and links)
-// Adjust this if your project is not directly in htdocs root
-define('BASE_URL', '/msgm_clothing/'); // Adjust this if your project lives in a subfolder
+// IMPORTANT: Do NOT define BASE_URL here. It should be defined ONLY in admin/includes/config.php.
+// The previous 'define('BASE_URL', ...)' line is REMOVED to prevent "Constant BASE_URL already defined" warnings.
 
-// Include database connection (assuming it's in a separate file)
-require_once __DIR__ . '/database.php'; // Path should be relative to functions.php
+// Include the main database connection file, which in turn includes your central config.php.
+// This will make BASE_URL, WEB_ROOT_URL, DB_HOST, etc., available for frontend use.
+require_once __DIR__ . '/../admin/includes/database.php';
+
 
 /**
  * Sanitizes input data to prevent XSS.
@@ -28,14 +30,16 @@ function sanitizeInput($data) {
 
 /**
  * Redirects the user to a specified location.
- * @param string $location The URL to redirect to (relative to BASE_URL).
+ * Uses WEB_ROOT_URL for absolute paths, which is best for redirects.
+ * @param string $location The URL to redirect to (relative to WEB_ROOT_URL).
  */
 function redirectTo($location) {
     // Ensure no output buffer is active before header
     if (ob_get_length()) {
         ob_end_clean(); // Clear any accidental output
     }
-    header("Location: " . BASE_URL . $location);
+    // WEB_ROOT_URL should now be defined via admin/includes/database.php -> admin/includes/config.php
+    header("Location: " . WEB_ROOT_URL . $location);
     exit();
 }
 
@@ -82,7 +86,3 @@ function displayMessage($message, $type = 'info') {
     echo '</div>';
 }
 
-// Add common frontend JavaScript for hero slider (should be within HTML body or footer)
-// Moved this part to the footer to ensure it's loaded after DOM.
-// If it's directly included in functions.php, it will be echoed too early.
-?>

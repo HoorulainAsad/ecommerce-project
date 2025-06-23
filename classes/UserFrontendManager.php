@@ -1,7 +1,8 @@
 <?php
 // classes/UserFrontendManager.php
 
-require_once __DIR__ . '/../includes/database.php';
+// In C:\xampp\htdocs\msgm_clothing\classes\CartManager.php
+require_once __DIR__ . '/../admin/includes/database.php';
 
 class UserFrontendManager {
     private $conn;
@@ -78,13 +79,5 @@ class UserFrontendManager {
         return null;
     }
 
-    /**
-     * Closes the database connection.
-     */
-    public function __destruct() {
-        if ($this->conn) {
-            $this->conn->close();
-        }
-    }
 }
 ?>

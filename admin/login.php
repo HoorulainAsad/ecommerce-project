@@ -6,7 +6,7 @@ require_once __DIR__ . '/includes/database.php'; // Include for database connect
 
 // Check if admin is already logged in, redirect to dashboard
 if (isLoggedIn()) {
-    redirectTo('index.php');
+    redirectToAdmin('index.php');
 }
 
 $message = '';
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION[ADMIN_USERNAME_SESSION_KEY] = $user['username'];
                     $stmt->close();
                     // No need to close connection - shutdown function will handle it
-                    redirectTo('index.php'); // Redirect to dashboard on successful login
+                    redirectToAdmin('index.php'); // Redirect to dashboard on successful login
                 } else {
                     $message = "Invalid username or password.";
                     $error = true;
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Admin Login - MSGM Bridal</title>
     <link href="https://fonts.googleapis.com/css2?family=Anonymous+Pro:ital,wght@0,400;0,700;1,400;1,700&family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     <!-- Link to your external stylesheet -->
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/styles.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>admin/assets/css/styles.css?v=3">
     
 </head>
 <body class="login-body">

@@ -10,8 +10,6 @@ class ProductManager {
         $this->conn = getDbConnection();
     }
 
-    // ... (rest of your ProductManager methods) ...
-
     // IMPORTANT: Ensure this __destruct() method is ABSENT or commented out if it tries to close the connection.
     /*
     public function __destruct() {
@@ -91,7 +89,7 @@ class ProductManager {
      */
     public function updateProduct($id, $name, $description, $price, $categoryId, $stock, $imageUrl = null) {
         $sql = "UPDATE products SET name = ?, description = ?, price = ?, category_id = ?, stock = ?, updated_at = NOW()";
-        $types = "ssdiis";
+        $types = "ssdii";
         $params = [$name, $description, $price, $categoryId, $stock];
 
         if ($imageUrl !== null) { // Only update image_url if a new one is provided
@@ -194,16 +192,36 @@ class ProductManager {
     }
 
     /**
+     * Retrieves new arrival products (products added in the last 30 days).
+     * @return array An array of product associative arrays.
+     */
+    public function getNewArrivalProducts() {
+        $sql = "SELECT p.*, c.name AS category_name
+                FROM products p
+                LEFT JOIN categories c ON p.category_id = c.id
+                WHERE p.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+                ORDER BY p.created_at DESC";
+        $result = $this->conn->query($sql);
+        $products = [];
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $products[] = $row;
+            }
+        }
+        return $products;
+    }
+
+    /**
      * Retrieves products belonging to a specific category ID, with category name.
      * @param int $categoryId The ID of the category.
      * @return array An array of product associative arrays.
      */
     public function getProductsByCategoryId($categoryId) {
         $sql = "SELECT p.id, p.name, p.description, p.price, p.stock, p.image_url, c.name AS category_name
-                FROM products p
-                JOIN categories c ON p.category_id = c.id
-                WHERE p.category_id = ?
-                ORDER BY p.name ASC";
+                 FROM products p
+                 JOIN categories c ON p.category_id = c.id
+                 WHERE p.category_id = ?
+                 ORDER BY p.name ASC";
         $stmt = $this->conn->prepare($sql);
         if (!$stmt) {
             error_log("ProductManager::getProductsByCategoryId - Prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
@@ -220,6 +238,33 @@ class ProductManager {
         }
         $stmt->close();
         return $products;
+    }
+
+    /**
+     * Decrements the stock of a product by a given quantity.
+     * @param int $productId
+     * @param int $quantity The amount to decrement the stock by.
+     * @return bool True on success, false on failure.
+     */
+    public function updateProductStock($productId, $quantity) {
+        $sql = "UPDATE products SET stock = stock - ? WHERE id = ? AND stock >= ?";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            error_log("ProductManager::updateProductStock - Prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
+            return false;
+        }
+        // Ensure stock doesn't go below zero (optional, but good practice)
+        // By checking stock >= quantity, we prevent negative stock.
+        // If you want to allow negative stock, remove the 'AND stock >= ?' and the third bind_param.
+        $stmt->bind_param("iii", $quantity, $productId, $quantity);
+        $result = $stmt->execute();
+        
+        if (!$result) {
+            error_log("ProductManager::updateProductStock - Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+        }
+
+        $stmt->close();
+        return $result;
     }
 }
 ?>

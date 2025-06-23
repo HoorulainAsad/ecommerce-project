@@ -52,24 +52,25 @@ switch (strtolower($filter)) {
             <?php endif; ?>
         </div>
     <?php else: ?>
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
-            <?php foreach ($products as $product): ?>
-                <div class="col">
-                    <div class="product-card">
-                        <img src="<?php echo BASE_URL . htmlspecialchars($product['image_url']); ?>" class="product-card-img" alt="<?php echo htmlspecialchars($product['name']); ?>" onerror="this.onerror=null;this.src='https://placehold.co/400x300/E0E0E0/555555?text=No+Image';">
-                        <div class="product-card-body">
-                            <h4><?php echo htmlspecialchars($product['name']); ?></h4>
-                            <p class="price">$<?php echo htmlspecialchars(number_format($product['price'], 2)); ?></p>
-                            <?php if ($product['is_out_of_stock']): ?>
-                                <span class="out-of-stock-badge">Out of Stock</span>
-                            <?php else: ?>
-                                <a href="<?php echo BASE_URL; ?>product_detail.php?id=<?php echo htmlspecialchars($product['id']); ?>" class="btn btn-details">View Details</a>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-            <?php endforeach; ?>
+        <div class="product-grid">
+    <?php foreach ($products as $product): ?>
+        <div class="product-card">
+            <div class="product-card-img-wrapper">
+                <img src="<?php echo BASE_URL . htmlspecialchars($product['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" onerror="this.onerror=null;this.src='https://placehold.co/400x300/E0E0E0/555555?text=No+Image';">
+            </div>
+            <div class="product-card-body">
+                <h4><?php echo htmlspecialchars($product['name']); ?></h4>
+                <p class="price">$<?php echo htmlspecialchars(number_format($product['price'], 2)); ?></p>
+                <?php if ($product['is_out_of_stock']): ?>
+                    <span class="out-of-stock-badge">Out of Stock</span>
+                <?php else: ?>
+                    <a href="<?php echo BASE_URL; ?>product_detail.php?id=<?php echo htmlspecialchars($product['id']); ?>" class="btn btn-details">View Details</a>
+                <?php endif; ?>
+            </div>
         </div>
+    <?php endforeach; ?>
+</div>
+
     <?php endif; ?>
 </div>
 

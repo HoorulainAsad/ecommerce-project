@@ -9,7 +9,7 @@ require_once __DIR__ . '/classes/ReviewManager.php';
 
 // Check if admin is logged in, otherwise redirect to login page
 if (!isLoggedIn()) {
-    redirectTo('login.php');
+    redirectToAdmin('login.php');
 }
 
 // Instantiate managers to fetch data for dashboard counts
@@ -41,7 +41,7 @@ $pendingReviews = $reviewManager->getReviewCountByStatus('Pending');
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Link to your external stylesheet -->
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/styles.css?v=2">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>admin/assets/css/styles.css?v=2">
 
 </head>
 <body>
@@ -54,32 +54,32 @@ $pendingReviews = $reviewManager->getReviewCountByStatus('Pending');
             <h1 class="page-header">Dashboard</h1>
 
             <div class="dashboard-stats">
-                <a href="<?php echo BASE_URL; ?>viewproducts.php" class="stat-card-link">
+                <a href="<?php echo BASE_URL; ?>admin/viewproducts.php" class="stat-card-link">
                     <i class="fas fa-tshirt icon"></i>
                     <div class="value"><?php echo $totalProducts; ?></div>
                     <div class="label">Total Products</div>
                 </a>
-                <a href="<?php echo BASE_URL; ?>vieworders.php" class="stat-card-link">
+                <a href="<?php echo BASE_URL; ?>admin/vieworders.php" class="stat-card-link">
                     <i class="fas fa-box-open icon"></i>
                     <div class="value"><?php echo $totalOrders; ?></div>
                     <div class="label">Total Orders</div>
                 </a>
-                <a href="<?php echo BASE_URL; ?>userdetails.php" class="stat-card-link">
+                <a href="<?php echo BASE_URL; ?>admin/userdetails.php" class="stat-card-link">
                     <i class="fas fa-users icon"></i>
                     <div class="value"><?php echo $totalUsers; ?></div>
                     <div class="label">Total Users</div>
                 </a>
-                <a href="<?php echo BASE_URL; ?>viewproducts.php?filter=new_arrivals" class="stat-card-link">
+                <a href="<?php echo BASE_URL; ?>admin/viewproducts.php?filter=new_arrivals" class="stat-card-link">
                     <i class="fas fa-star icon"></i>
                     <div class="value"><?php echo $newArrivalsCount; ?></div>
                     <div class="label">New Arrivals (Last 30 Days)</div>
                 </a>
-                <a href="<?php echo BASE_URL; ?>viewproducts.php?filter=trendy" class="stat-card-link">
+                <a href="<?php echo BASE_URL; ?>admin/viewproducts.php?filter=trendy" class="stat-card-link">
                     <i class="fas fa-fire icon"></i>
                     <div class="value"><?php echo $trendyCollectionCount; ?></div>
                     <div class="label">Trendy Products (Ordered)</div>
                 </a>
-                <a href="<?php echo BASE_URL; ?>customerfeedback.php?filter=pending" class="stat-card-link">
+                <a href="<?php echo BASE_URL; ?>admin/customerfeedback.php?filter=pending" class="stat-card-link">
                     <i class="fas fa-comments icon"></i>
                     <div class="value"><?php echo $pendingReviews; ?></div>
                     <div class="label">Pending Reviews</div>
@@ -87,22 +87,22 @@ $pendingReviews = $reviewManager->getReviewCountByStatus('Pending');
             </div>
 
             <div class="dashboard-actions">
-                <a href="<?php echo BASE_URL; ?>addproduct.php" class="action-button primary">
+                <a href="<?php echo BASE_URL; ?>admin/addproduct.php" class="action-button primary">
                     <i class="fas fa-plus-circle"></i> Add New Product
                 </a>
-                <a href="<?php echo BASE_URL; ?>viewproducts.php" class="action-button primary">
+                <a href="<?php echo BASE_URL; ?>admin/viewproducts.php" class="action-button primary">
                     <i class="fas fa-tshirt"></i> View Products
                 </a>
-                <a href="<?php echo BASE_URL; ?>managecategory.php" class="action-button secondary">
+                <a href="<?php echo BASE_URL; ?>admin/managecategory.php" class="action-button secondary">
                     <i class="fas fa-list-alt"></i> Manage Categories
                 </a>
-                <a href="<?php echo BASE_URL; ?>vieworders.php" class="action-button link-view-orders">
+                <a href="<?php echo BASE_URL; ?>admin/vieworders.php" class="action-button link-view-orders">
                     <i class="fas fa-shopping-cart"></i> View Orders
                 </a>
-                <a href="<?php echo BASE_URL; ?>userdetails.php" class="action-button primary">
+                <a href="<?php echo BASE_URL; ?>admin/userdetails.php" class="action-button primary">
                     <i class="fas fa-users"></i> View Users
                 </a>
-                <a href="<?php echo BASE_URL; ?>customerfeedback.php" class="action-button secondary">
+                <a href="<?php echo BASE_URL; ?>admin/customerfeedback.php" class="action-button secondary">
                     <i class="fas fa-comments"></i> Manage Reviews
                 </a>
             </div>

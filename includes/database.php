@@ -1,26 +1,26 @@
 <?php
-// includes/database.php (Frontend)
+// C:\xampp\htdocs\msgm_clothing\includes\database.php (YOUR MAIN DATABASE CONFIG)
 
-// Database connection constants for the frontend application
-// Make sure these match your actual MySQL database credentials
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');    // Your MySQL username (default for XAMPP)
-define('DB_PASS', '');        // Your MySQL password (default for XAMPP is empty)
-define('DB_NAME', 'msgm_database'); // Your database names
+// Database connection constants - wrapped in defined() for safety
+// This ensures constants are defined only once, even if included multiple times.
+if (!defined('DB_HOST')) {
+    define('DB_HOST', 'localhost'); // Your MySQL host
+}
+if (!defined('DB_USER')) {
+    define('DB_USER', 'root');      // Your MySQL username
+}
+if (!defined('DB_PASS')) {
+    define('DB_PASS', '');          // Your MySQL password (default for XAMPP is empty)
+}
+if (!defined('DB_NAME')) {
+    define('DB_NAME', 'msgm_database'); // Your database name (ensure this is correct for all parts of your app)
+}
 
 /**
- * Establishes and returns a new database connection.
+ * Establishes and returns a single database connection.
+ * Uses a static variable to ensure only one connection is made per request.
  * @return mysqli The database connection object.
+ * @throws Exception If database connection fails.
  */
-function getDbConnection() {
-    $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-
-    // Check connection
-    if ($conn->connect_error) {
-        // Log the error in production, but for development, we die with the error.
-        error_log("Database Connection failed: " . $conn->connect_error);
-        die("Database Connection failed: " . $conn->connect_error);
-    }
-    return $conn;
-}
+$conn->set_charset("utf8mb4");
 ?>

@@ -1,7 +1,8 @@
 <?php
 // classes/CategoryFrontendManager.php
 
-require_once __DIR__ . '/../includes/database.php';
+// In C:\xampp\htdocs\msgm_clothing\classes\CartManager.php
+require_once __DIR__ . '/../admin/includes/database.php';
 
 class CategoryFrontendManager {
     private $conn;
@@ -46,13 +47,6 @@ class CategoryFrontendManager {
         return $category;
     }
 
-    /**
-     * Closes the database connection.
-     */
-    public function __destruct() {
-        if ($this->conn) {
-            $this->conn->close();
-        }
-    }
+    
 }
 ?>

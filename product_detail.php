@@ -39,102 +39,121 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     }
 }
 ?>
-<div class="container-fluid container-xl py-5 page-content">
-    <?php if ($message): ?>
-        <div class="row mb-4">
-            <div class="col-12">
-                <?php displayMessage($message, $message_type); ?>
-            </div>
-        </div>
-    <?php endif; ?>
 
-    <?php if ($product): ?>
-        <div class="row gx-5">
-            <div class="col-lg-6 mb-4 mb-lg-0">
-                <div class="product-detail-image-container bg-white rounded-3 shadow-sm p-3">
-                    <img src="<?php echo BASE_URL . htmlspecialchars($product['image_url']); ?>" class="img-fluid rounded-3" alt="<?php echo htmlspecialchars($product['name']); ?>" onerror="this.onerror=null;this.src= https://placehold.co/600x700/E0E0E0/555555?text=Product+Image';">
+<!-- 🔽 Main Content Wrapper Start -->
+<main class="main-content">
+    <div class="container-xl my-5">
+        <?php if ($message): ?>
+            <div class="alert alert-<?php echo $message_type === 'success' ? 'success' : 'danger'; ?>">
+                <?php echo htmlspecialchars($message); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($product): ?>
+            <div class="product-details-container">
+                <!-- Product Image -->
+                <div class="main-image-wrapper" id="mainImageWrapper">
+                    <img id="mainImage" src="<?php echo BASE_URL . htmlspecialchars($product['image_url']); ?>"
+                         alt="<?php echo htmlspecialchars($product['name']); ?>"
+                         onerror="this.onerror=null;this.src='https://placehold.co/600x700/E0E0E0/555555?text=Product+Image';">
                 </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="product-details-content">
-                    <h1 class="text-primary-custom mb-3"><?php echo htmlspecialchars($product['name']); ?></h1>
-                    <p class="lead text-dark-custom mb-4">$<?php echo htmlspecialchars(number_format($product['price'], 2)); ?></p>
 
-                    <p class="text-muted-gray mb-4"><?php echo nl2br(htmlspecialchars($product['description'])); ?></p>
+                <!-- Product Info -->
+                <div class="product-info-details">
+                    <h1><?php echo htmlspecialchars($product['name']); ?></h1>
+                    <p class="description"><?php echo nl2br(htmlspecialchars($product['description'])); ?></p>
+                    <p class="price">Rs. <?php echo number_format($product['price'], 0); ?></p>
 
-                    <div class="mb-4">
-                        <span class="fw-bold me-2 text-dark-custom">Category:</span>
-                        <span class="text-muted-gray"><?php echo htmlspecialchars($product['category_name'] ?? 'N/A'); ?></span>
-                    </div>
-
-                    <div class="mb-4">
-                        <span class="fw-bold me-2 text-dark-custom">Availability:</span>
+                    <p><strong>Category:</strong> <?php echo htmlspecialchars($product['category_name'] ?? 'N/A'); ?></p>
+                    <p><strong>Availability:</strong>
                         <?php if ($product['is_out_of_stock']): ?>
-                            <span class="out-of-stock-badge">Out of Stock</span>
+                            <span class="badge bg-danger">Out of Stock</span>
                         <?php else: ?>
-                            <span class="badge bg-success">In Stock (<?php echo htmlspecialchars($product['stock']); ?> available)</span>
+                            <span class="badge bg-success">In Stock (<?php echo htmlspecialchars($product['stock']); ?>)</span>
                         <?php endif; ?>
-                    </div>
+                    </p>
 
-                    <form action="<?php echo BASE_URL; ?>product_detail.php?id=<?php echo htmlspecialchars($product['id']); ?>" method="POST" class="mb-4">
-                        <div class="mb-3">
-                            <label class="form-label text-dark-custom fw-bold">Select Size:</label><br>
-                            <div class="btn-group" role="group" aria-label="Product sizes">
-                                <input type="radio" class="btn-check" name="size" id="size-small" value="Small" autocomplete="off" checked>
-                                <label class="btn btn-outline-primary-custom" for="size-small">Small</label>
-
-                                <input type="radio" class="btn-check" name="size" id="size-medium" value="Medium" autocomplete="off">
-                                <label class="btn btn-outline-primary-custom" for="size-medium">Medium</label>
-
-                                <input type="radio" class="btn-check" name="size" id="size-large" value="Large" autocomplete="off">
-                                <label class="btn btn-outline-primary-custom" for="size-large">Large</label>
-                            </div>
+                    <form method="POST">
+                        <!-- Size Options -->
+                        <div class="size-options mb-3">
+                            <button type="submit" name="size" value="Small"
+                                    class="size-btn <?php if ($_POST['size'] ?? '' === 'Small') echo 'active'; ?>">Small</button>
+                            <button type="submit" name="size" value="Medium"
+                                    class="size-btn <?php if ($_POST['size'] ?? '' === 'Medium') echo 'active'; ?>">Medium</button>
+                            <button type="submit" name="size" value="Large"
+                                    class="size-btn <?php if ($_POST['size'] ?? '' === 'Large') echo 'active'; ?>">Large</button>
                         </div>
 
+                        <!-- Add to Cart -->
                         <?php if (!$product['is_out_of_stock']): ?>
-                            <button type="submit" name="add_to_cart" class="btn btn-primary-custom btn-lg me-3">
-                                <i class="fas fa-cart-plus me-2"></i> Add to Cart
+                            <button type="submit" name="add_to_cart" class="btn-add-to-cart mb-3">
+                                <i class="fas fa-cart-plus me-2"></i> ADD TO CART
                             </button>
                         <?php else: ?>
-                            <button type="button" class="btn btn-secondary btn-lg" disabled>Out of Stock</button>
+                            <button type="button" class="btn btn-secondary" disabled>Out of Stock</button>
                         <?php endif; ?>
 
-                        <!-- Size Guide Button -->
-                        <button type="button" class="btn btn-outline-secondary-custom btn-lg" data-bs-toggle="modal" data-bs-target="#sizeGuideModal">
-                            <i class="fas fa-ruler-horizontal me-2"></i> Size Guide
+                        <!-- Size Guide -->
+                        <br>
+                        <button type="button" class="size-guide-btn" data-bs-toggle="modal" data-bs-target="#sizeGuideModal">
+                            SIZE GUIDE
                         </button>
                     </form>
                 </div>
+            </div> <!-- .product-details-container -->
+
+        <?php else: ?>
+            <div class="text-center">
+                <p class="text-muted"><?php echo htmlspecialchars($message); ?></p>
+                <a href="<?php echo BASE_URL; ?>index.php" class="btn btn-primary">Back to Home</a>
             </div>
-        </div>
-    <?php else: ?>
-        <p class="text-center text-muted-gray"><?php echo htmlspecialchars($message); ?></p>
-        <div class="text-center mt-4">
-            <a href="<?php echo BASE_URL; ?>index.php" class="btn btn-primary-custom">Back to Home</a>
-        </div>
-    <?php endif; ?>
-</div>
+        <?php endif; ?>
+    </div>
+</main> <!-- 🔼 Main Content Wrapper End -->
 
 <!-- Size Guide Modal -->
 <div class="modal fade" id="sizeGuideModal" tabindex="-1" aria-labelledby="sizeGuideModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-primary-custom text-white">
+            <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="sizeGuideModalLabel">Size Guide</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body text-center">
                 <p>Please refer to the chart below for accurate sizing:</p>
-                <img src="<?php echo BASE_URL; ?>assets/img/size_chart.png" class="img-fluid rounded-3" alt="Size Chart" onerror="this.onerror=null;this.src='https://placehold.co/800x600/E0E0E0/555555?text=Size+Chart+Placeholder';">
-                <small class="text-muted mt-3 d-block">Measurements are in inches, unless otherwise specified. Please allow for slight variations.</small>
+                <img src="<?php echo BASE_URL; ?>assets/img/size_chart.png" class="img-fluid rounded-3" alt="Size Chart"
+                     onerror="this.onerror=null;this.src='https://placehold.co/800x600/E0E0E0/555555?text=Size+Chart+Placeholder';">
+                <small class="text-muted mt-3 d-block">Measurements are in inches. Slight variations may occur.</small>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary-custom" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Your HTML UI below (same as your code above)... -->
-<!-- ... -->
+<!-- Image Zoom Script -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const wrapper = document.getElementById('mainImageWrapper');
+    const image = document.getElementById('mainImage');
+    let zoomedIn = false;
+
+    wrapper.addEventListener('click', function (e) {
+        zoomedIn = !zoomedIn;
+        if (zoomedIn) {
+            const rect = wrapper.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+            image.style.transform = 'scale(2)';
+            image.style.transformOrigin = `${x}% ${y}%`;
+            wrapper.style.cursor = 'zoom-out';
+        } else {
+            image.style.transform = 'scale(1)';
+            wrapper.style.cursor = 'zoom-in';
+        }
+    });
+});
+</script>
+
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

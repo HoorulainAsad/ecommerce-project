@@ -7,7 +7,7 @@ require_once __DIR__ . '/classes/ProductManager.php'; // Needed to fetch product
 
 // Check if admin is logged in
 if (!isLoggedIn()) {
-    redirectTo('login.php');
+    redirectToAdmin('login.php');
 }
 
 $categoryManager = new CategoryManager();
@@ -73,7 +73,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
         }
     }
     // Redirect to clear GET parameters after deletion
-    redirectTo('managecategory.php?msg=' . urlencode($message) . '&type=' . $message_type);
+    redirectToAdmin('managecategory.php?msg=' . urlencode($message) . '&type=' . $message_type);
 }
 
 // Check for messages from redirects (e.g., after deletion)
@@ -103,7 +103,7 @@ $otherCategoriesToDisplay = array_filter($allMainCategories, function($cat) use 
     <title>Manage Categories - MSGM Bridal Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Anonymous+Pro:ital,wght@0,400;0,700;1,400;1,700&family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/styles.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>admin/assets/css/styles.css">
     <!-- <style>
         .category-section {
             background-color: #fff;
@@ -178,7 +178,7 @@ $otherCategoriesToDisplay = array_filter($allMainCategories, function($cat) use 
                                         <tr>
                                             <td data-label="Image">
                                                 <?php if (!empty($product['image_url'])): ?>
-                                                    <img src="<?php echo WEB_ROOT_URL . htmlspecialchars($product['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="product-image-thumb" onerror="this.onerror=null;this.src='https://placehold.co/80x80/E0E0E0/555555?text=No+Image';">
+                                                    <img src="<?php echo BASE_URL . htmlspecialchars($product['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="product-image-thumb" onerror="this.onerror=null;this.src='https://placehold.co/80x80/E0E0E0/555555?text=No+Image';">
                                                 <?php else: ?>
                                                     <img src="https://placehold.co/80x80/E0E0E0/555555?text=No+Image" alt="No Image" class="product-image-thumb">
                                                 <?php endif; ?>
@@ -193,8 +193,8 @@ $otherCategoriesToDisplay = array_filter($allMainCategories, function($cat) use 
                                                 <?php endif; ?>
                                             </td>
                                             <td data-label="Actions" class="action-links">
-                                                <a href="<?php echo BASE_URL; ?>editproduct.php?id=<?php echo $product['id']; ?>" title="Edit"><i class="fas fa-edit"></i></a>
-                                                <a href="<?php echo BASE_URL; ?>viewproducts.php?action=delete&id=<?php echo $product['id']; ?>" onclick="return confirm('Are you sure you want to delete this product?');" title="Delete"><i class="fas fa-trash-alt"></i></a>
+                                                <a href="<?php echo BASE_URL; ?>admin/editproduct.php?id=<?php echo $product['id']; ?>" title="Edit"><i class="fas fa-edit"></i></a>
+                                                <a href="<?php echo BASE_URL; ?>admin/viewproducts.php?action=delete&id=<?php echo $product['id']; ?>" onclick="return confirm('Are you sure you want to delete this product?');" title="Delete"><i class="fas fa-trash-alt"></i></a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -225,7 +225,7 @@ $otherCategoriesToDisplay = array_filter($allMainCategories, function($cat) use 
                                     <td data-label="ID"><?php echo htmlspecialchars($category['id']); ?></td>
                                     <td data-label="Category Name"><?php echo htmlspecialchars($category['name']); ?></td>
                                     <td data-label="Actions" class="action-links">
-                                        <a href="<?php echo BASE_URL; ?>managecategory.php?action=delete&id=<?php echo $category['id']; ?>" onclick="return confirm('Are you sure you want to delete this category? Products linked to it will have their category set to NULL.');" title="Delete"><i class="fas fa-trash-alt"></i></a>
+                                        <a href="<?php echo BASE_URL; ?>admin/managecategory.php?action=delete&id=<?php echo $category['id']; ?>" onclick="return confirm('Are you sure you want to delete this category? Products linked to it will have their category set to NULL.');" title="Delete"><i class="fas fa-trash-alt"></i></a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

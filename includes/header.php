@@ -3,6 +3,9 @@
 
 // Ensure functions are loaded (which starts session and includes config/database)
 require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/../classes/CartManager.php';
+$cartManager = new CartManager();
+$cartItemCount = $cartManager->getTotalCartItemCount();
 
 // At this point, session_start() should have run successfully.
 ?>
@@ -26,7 +29,7 @@ require_once __DIR__ . '/functions.php';
     <div class="container-fluid container-xl">
         <a class="navbar-brand" href="<?php echo BASE_URL; ?>index.php">
             <!-- Logo placeholder -->
-            <img src="<?php echo BASE_URL; ?>assets/img/logo.png" alt="MSGM Bridal Logo" style="height: 40px; margin-right: 10px;" onerror="this.onerror=null;this.src='https://placehold.co/150x40/E9E3CE/7F0E10?text=MSGM+Bridal';">
+            <img src="<?php echo BASE_URL; ?>assets/img/logo.png" alt="MSGM Bridal Logo"  onerror="this.onerror=null;this.src='https://placehold.co/150x40/E9E3CE/7F0E10?text=MSGM+Bridal';">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -60,7 +63,8 @@ require_once __DIR__ . '/functions.php';
                 <a href="<?php echo BASE_URL; ?>cart.php" class="cart-icon position-relative">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cart-item-count">
-                        0 <!-- Dynamic count will be updated via JS/PHP later -->
+                        <?php echo $cartItemCount; ?>
+ <!-- Dynamic count will be updated via JS/PHP later -->
                     </span>
                 </a>
             </div>

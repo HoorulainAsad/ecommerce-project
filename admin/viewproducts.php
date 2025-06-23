@@ -8,7 +8,7 @@ require_once __DIR__ . '/classes/OrderManager.php'; // Needed for trendy product
 
 // Check if admin is logged in
 if (!isLoggedIn()) {
-    redirectTo('login.php');
+    redirectToAdmin('login.php');
 }
 
 $productManager = new ProductManager();
@@ -87,7 +87,7 @@ if ($filter === 'new_arrivals') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $pageTitle; ?> - MSGM Bridal Admin</title><link href="https://fonts.googleapis.com/css2?family=Anonymous+Pro:ital,wght@0,400;0,700;1,400;1,700&family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/styles.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>admin/assets/css/styles.css">
 </head>
 <body>
     <div class="admin-wrapper">
@@ -105,7 +105,7 @@ if ($filter === 'new_arrivals') {
             <?php if ($filter): // Show filter info if filter is active ?>
                 <div class="filter-header">
                     <i class="fas fa-filter"></i> Displaying: <?php echo htmlspecialchars($pageTitle); ?>
-                    <a href="<?php echo BASE_URL; ?>viewproducts.php" style="margin-left: 15px;">Clear Filter</a>
+                    <a href="<?php echo BASE_URL; ?>admin/viewproducts.php" style="margin-left: 15px;">Clear Filter</a>
                 </div>
             <?php endif; ?>
 
@@ -115,7 +115,7 @@ if ($filter === 'new_arrivals') {
             <?php if (empty($products)): ?>
                 <p>No products found <?php echo $filter ? 'matching this filter.' : '.'; ?>
                 <?php if ($filter === 'new_arrivals'): ?>
-                    <a href="<?php echo BASE_URL; ?>addproduct.php">Add a new product</a> to see it here.
+                    <a href="<?php echo BASE_URL; ?>admin/addproduct.php">Add a new product</a> to see it here.
                 <?php elseif ($filter === 'trendy'): ?>
                     Once orders are placed, products will appear here.
                 <?php endif; ?>
@@ -149,18 +149,24 @@ if ($filter === 'new_arrivals') {
                                 <td data-label="Category"><?php echo htmlspecialchars($product['category_name'] ?? 'N/A'); ?></td>
                                 <td data-label="Price">$<?php echo htmlspecialchars(number_format($product['price'], 2)); ?></td>
                                 <td data-label="Stock Status">
-                                    <?php if ($product['stock'] <= 0): ?>
-                                        <span class="out-of-stock-label">Out of Stock</span>
-                                    <?php else: ?>
-                                        <span class="in-stock-label"><?php echo htmlspecialchars($product['stock']); ?> In Stock</span>
-                                    <?php endif; ?>
-                                </td>
+                                <?php
+                                // Use the null coalescing operator to safely access 'stock', defaulting to 0 if not set.
+                                // This prevents the "Undefined array key" warning.
+                                $current_stock = $product['stock'] ?? 0;
+
+                                if ($current_stock <= 0):
+                                ?>
+                                    <span class="out-of-stock-label">Out of Stock</span>
+                                <?php else: ?>
+                                    <span class="in-stock-label"><?php echo htmlspecialchars($current_stock); ?> In Stock</span>
+                                <?php endif; ?>
+                            </td>
                                 <?php if ($filter === 'trendy'): ?>
                                     <td data-label="Ordered Quantity"><?php echo htmlspecialchars($product['total_ordered_quantity'] ?? 0); ?></td>
                                 <?php endif; ?>
                                 <td data-label="Actions" class="action-links">
-                                    <a href="<?php echo BASE_URL; ?>editproduct.php?id=<?php echo $product['id']; ?>" title="Edit"><i class="fas fa-edit"></i></a>
-                                    <a href="<?php echo BASE_URL; ?>viewproducts.php?action=delete&id=<?php echo $product['id']; ?>" onclick="return confirm('Are you sure you want to delete this product?');" title="Delete"><i class="fas fa-trash-alt"></i></a>
+                                    <a href="<?php echo BASE_URL; ?>admin/editproduct.php?id=<?php echo $product['id']; ?>" title="Edit"><i class="fas fa-edit"></i></a>
+                                    <a href="<?php echo BASE_URL; ?>admin/viewproducts.php?action=delete&id=<?php echo $product['id']; ?>" onclick="return confirm('Are you sure you want to delete this product?');" title="Delete"><i class="fas fa-trash-alt"></i></a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

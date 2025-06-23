@@ -6,7 +6,7 @@ require_once __DIR__ . '/classes/UserManager.php';
 
 // Check if admin is logged in
 if (!isLoggedIn()) {
-    redirectTo('login.php');
+    redirectToAdmin('login.php');
 }
 
 $userManager = new UserManager();
@@ -22,7 +22,7 @@ $users = $userManager->getAllUsers();
     <title>User Details - MSGM Bridal Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Anonymous+Pro:ital,wght@0,400;0,700;1,400;1,700&family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/styles.css"> <!-- Link to external stylesheet -->
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>admin/assets/css/styles.css"> <!-- Link to external stylesheet -->
 </head>
 <body>
     <div class="admin-wrapper">

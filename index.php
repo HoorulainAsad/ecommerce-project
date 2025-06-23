@@ -1,6 +1,10 @@
 <?php
 // index.php (Home Page)
 
+
+
+
+
 require_once __DIR__ . '/includes/header.php';
 require_once __DIR__ . '/classes/ProductFrontendManager.php';
 require_once __DIR__ . '/classes/CategoryFrontendManager.php';
@@ -37,11 +41,64 @@ $heroImages = [
 
 <!-- All other sections remain unchanged from your original code -->
 <?php
-// [Copy everything from Bridal to New Arrivals section — unchanged]
-// ...
+$allCategories = $categoryManager->getAllCategories();
 
-// Shop Now Call to Action section
 ?>
+
+<section class="category-section">
+    <div class="container">
+        <h2 class="section-heading">Explore By Categories</h2>
+        <div class="oval-categories-grid">
+            <!-- Dynamic Categories -->
+             <?php
+                function getCategoryImage($categoryName) {
+                    $name = strtolower(trim($categoryName));
+                    $filename = $name . '.jpg'; // or .png depending on what you're using
+                    $path = 'assets/img/' . $filename;
+
+                    // Use placeholder if image doesn't exist
+                    return WEB_ROOT_URL . $path;
+                }
+                ?>
+
+            <?php foreach ($allCategories as $category): ?>
+                <a href="<?php echo BASE_URL . 'category.php?name=' . urlencode($category['name']); ?>" class="category-oval-card">
+                    <div class="category-oval-image-wrapper">
+                        <div class="floral-border">
+        <img src="<?php echo getCategoryImage($category['name']); ?>" alt="<?php echo htmlspecialchars($category['name']); ?>" onerror="this.src='https://placehold.co/200x250?text=No+Image';">
+        </div>
+                    </div>
+                    <div class="category-oval-name"><?php echo htmlspecialchars($category['name']); ?></div>
+                </a>
+            <?php endforeach; ?>
+
+            <!-- New Arrivals -->
+            <a href="<?php echo BASE_URL . 'category.php?name=new_arrivals'; ?>" class="category-oval-card">
+                <div class="category-oval-image-wrapper">
+                    <div class="floral-border">
+                    <img src="<?php echo WEB_ROOT_URL . 'images/new_arrivals_placeholder.png'; ?>" alt="New Arrivals" onerror="this.src='https://placehold.co/200x250?text=New+Arrivals';">
+                    </div>
+                </div>
+                <div class="category-oval-name">New Arrivals</div>
+            </a>
+
+            <!-- Trending -->
+            <a href="<?php echo BASE_URL . 'category.php?name=trendy'; ?>" class="category-oval-card">
+                <div class="category-oval-image-wrapper">
+                    <div class="floral-border">
+                    <img src="<?php echo WEB_ROOT_URL . 'images/trending_placeholder.png'; ?>" alt="Trending Products" onerror="this.src='https://placehold.co/200x250?text=Trending';">
+                     <img src="assets/img/floral-frame.png" class="floral-overlay">
+                    </div>
+                </div>
+                <div class="category-oval-name">Trending Products</div>
+            </a>
+        </div>
+    </div>
+</section>
+
+
+
+
 <section class="shop-now-section">
     <div class="container-fluid container-xl">
         <h2>Ready to Find Your Perfect Outfit?</h2>

@@ -1,42 +1,58 @@
 <?php
-// admin/includes/config.php
+// C:\xampp\htdocs\msgm_clothing\admin\includes\config.php
+// THIS IS YOUR CENTRAL CONFIGURATION FILE FOR BOTH FRONTEND AND ADMIN
 
-// Database Credentials
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'msgm_database'); // Ensure this matches your database name
+// Database Connection Constants - Wrapped in defined() for safety
+if (!defined('DB_HOST')) {
+    define('DB_HOST', 'localhost');
+}
+if (!defined('DB_USER')) {
+    define('DB_USER', 'root');
+}
+if (!defined('DB_PASS')) {
+    define('DB_PASS', '');
+}
+if (!defined('DB_NAME')) {
+    define('DB_NAME', 'msgm_database'); // Ensure this is the correct database name
+}
 
-// Admin User Session Keys (CRITICAL for login functionality)
 define('ADMIN_SESSION_KEY', 'admin_logged_in');
 define('ADMIN_USERNAME_SESSION_KEY', 'admin_username');
 
-// =======================================================================
-// Base URL Definitions:
-//
-// 1. BASE_URL: For links and assets within the ADMIN PANEL itself.
-//    This should be the web-accessible path to your 'admin' folder.
-//    Based on your XAMPP setup (C:\xampp\htdocs\msgm_clothing\admin\),
-//    this will be /msgm_clothing/admin/
-define('BASE_URL', '/msgm_clothing/admin/');
+// --- CRITICAL CHANGES BELOW ---
 
-// 2. WEB_ROOT_URL: For images and assets that are referenced from the
-//    main website's root. This is used in the admin panel to correctly
-//    display product images stored relative to the main site's root.
-//    This should be the web-accessible path to your 'msgm_clothing' folder.
-define('WEB_ROOT_URL', '/msgm_clothing/');
-// =======================================================================
+// Application Base URL (for frontend and shared assets like styles.css)
+// This should be the path to your 'msgm_clothing' folder, relative to your web server's document root.
+// If your website is accessed at http://localhost/msgm_clothing/
+if (!defined('BASE_URL')) {
+    define('BASE_URL', '/msgm_clothing/'); // <--- Make sure this line is exactly like this
+}
 
-// Session cookie settings (optional but good practice for security)
-ini_set('session.cookie_httponly', 1);
-ini_set('session.use_strict_mode', 1);
-session_set_cookie_params([
-    'lifetime' => 3600, // 1 hour
-    'path' => '/',
-    'domain' => '', // Leave empty for localhost, or set to your domain (e.g., 'yourdomain.com')
-    'secure' => false, // Set to true if using HTTPS
-    'httponly' => true,
-    'samesite' => 'Lax'
-]);
+// Web Root URL (for absolute redirects, full path including http://)
+// This is used for header redirects and image URLs. It should match BASE_URL conceptually
+// but might be used for absolute file paths on the server or full URL links.
+// For image URLs in HTML, it should typically be the same as BASE_URL.
+if (!defined('WEB_ROOT_URL')) {
+    define('WEB_ROOT_URL', BASE_URL); // For consistency, let's keep this aligned with BASE_URL for now.
+}
 
-?>
+// You commented out session start and error reporting. Re-enable them for development!
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Define Environment (e.g., 'development' or 'production')
+if (!defined('ENVIRONMENT')) {
+    define('ENVIRONMENT', 'development'); // Change to 'production' when live
+}
+
+// Set error reporting based on environment
+if (defined('ENVIRONMENT') && ENVIRONMENT === 'development') {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+} else {
+    ini_set('display_errors', 0);
+    ini_set('display_startup_errors', 0);
+    error_reporting(0); // Turn off all error reporting in production
+}
