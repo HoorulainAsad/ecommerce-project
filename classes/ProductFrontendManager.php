@@ -14,20 +14,19 @@ class ProductFrontendManager {
     /**
      * Retrieves products based on filter (all, category, new arrivals, trendy).
      * @param string $filter 'all', 'bridal', 'formal', 'partywear', 'new_arrivals', 'trendy'.
-     * @param int|null $limit Optional limit for number of products.
+     * @param int|null $limit Optional limit for number of products. Default is 10 for trendy if not specified.
+     * @param int $days Optional number of days to look back for trendy products (default 30).
      * @return array An array of product associative arrays.
      */
-    public function getFilteredProducts($filter = 'all', $limit = null) {
-        $sql = "SELECT p.id, p.name, p.description, p.price, p.stock, p.image_url, c.name AS category_name, c.id AS category_id
-                FROM products p
-                LEFT JOIN categories c ON p.category_id = c.id";
-
+    public function getFilteredProducts($filter = 'all', $limit = null, $days = 30) {
+        $sql = ""; // Initialize SQL query string
         $whereClause = "";
         $params = [];
         $types = "";
-        $orderBy = "p.created_at DESC"; // Default order
+        $orderBy = ""; // Default order, can be overridden by specific cases
+        $groupBy = ""; // For trendy products
 
-        switch ($filter) {
+        switch (strtolower($filter)) {
             case 'bridal':
             case 'formal':
             case 'partywear':
@@ -42,53 +41,86 @@ class ProductFrontendManager {
                     $cat = $resultCat->fetch_assoc();
                     $stmtCat->close();
                     if ($cat) {
+                        $sql = "SELECT p.id, p.name, p.description, p.price, p.stock, p.image_url, c.name AS category_name, c.id AS category_id
+                                FROM products p LEFT JOIN categories c ON p.category_id = c.id";
                         $whereClause = " WHERE p.category_id = ?";
                         $params[] = $cat['id'];
                         $types .= "i";
+                        $orderBy = "p.name ASC";
+                    } else {
+                        // Category not found, return empty set
+                        return [];
                     }
+                } else {
+                    error_log("ProductFrontendManager: Category lookup prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
+                    return [];
                 }
                 break;
+
             case 'new_arrivals':
+                $sql = "SELECT p.id, p.name, p.description, p.price, p.stock, p.image_url, c.name AS category_name, c.id AS category_id
+                        FROM products p LEFT JOIN categories c ON p.category_id = c.id";
                 $whereClause = " WHERE p.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
                 $orderBy = "p.created_at DESC";
                 break;
+
             case 'trendy':
-                // For trendy, we need to join with order_items and count
+                // --- CORRECTED SQL FOR TRENDY PRODUCTS ---
                 $sql = "SELECT p.id, p.name, p.description, p.price, p.stock, p.image_url, c.name AS category_name, c.id AS category_id,
                                SUM(oi.quantity) AS total_ordered_quantity
-                        FROM products p
-                        LEFT JOIN categories c ON p.category_id = c.id
-                        LEFT JOIN order_items oi ON p.id = oi.product_id
-                        GROUP BY p.id, p.name, p.description, p.price, p.stock, p.image_url, c.name, c.id
-                        ORDER BY total_ordered_quantity DESC";
-                $orderBy = null; // Overridden by custom order by in the query itself
+                         FROM products p
+                         LEFT JOIN categories c ON p.category_id = c.id
+                         JOIN order_items oi ON p.id = oi.product_id
+                         JOIN orders o ON oi.order_id = o.id"; // Added JOIN to orders
+                
+                $whereClause = " WHERE o.order_date >= DATE_SUB(NOW(), INTERVAL ? DAY)"; // Date filter
+                $params[] = $days; // Bind the 'days' parameter
+                $types .= "i";
+
+                $groupBy = " GROUP BY p.id, p.name, p.description, p.price, p.stock, p.image_url, c.name, c.id";
+                $orderBy = "total_ordered_quantity DESC";
+                
+                // If limit is not explicitly set, use 3 for trendy products by default
+                if ($limit === null) {
+                    $limit = 3; 
+                }
                 break;
+
             case 'all':
             default:
-                // No specific where clause for 'all'
+                $sql = "SELECT p.id, p.name, p.description, p.price, p.stock, p.image_url, c.name AS category_name, c.id AS category_id
+                        FROM products p LEFT JOIN categories c ON p.category_id = c.id";
                 $orderBy = "p.name ASC"; // Default alphabetical for 'all' products
                 break;
         }
 
-        $fullSql = $sql . $whereClause;
-        if ($orderBy) {
+        $fullSql = $sql . $whereClause . $groupBy; // Concatenate GROUP BY before ORDER BY
+        
+        if (!empty($orderBy)) { // Only append ORDER BY if it's not empty
             $fullSql .= " ORDER BY " . $orderBy;
         }
+
         if ($limit !== null && is_int($limit) && $limit > 0) {
             $fullSql .= " LIMIT ?";
             $params[] = $limit;
             $types .= "i";
         }
 
-
         $stmt = $this->conn->prepare($fullSql);
         if (!$stmt) {
-            error_log("ProductFrontendManager: Prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
+            error_log("ProductFrontendManager: Prepare failed for filter '{$filter}' - (" . $this->conn->errno . ") " . $this->conn->error . " SQL: " . $fullSql);
             return [];
         }
 
         if (!empty($params)) {
-            $stmt->bind_param($types, ...$params);
+            // Use call_user_func_array for bind_param with dynamic parameters
+            $bind_names = array($types);
+            for ($i = 0; $i < count($params); $i++) {
+                $bind_name = 'bind' . $i;
+                $$bind_name = &$params[$i]; // Create a variable reference
+                $bind_names[] = &$$bind_name;
+            }
+            call_user_func_array(array($stmt, 'bind_param'), $bind_names);
         }
 
         $stmt->execute();
@@ -131,7 +163,5 @@ class ProductFrontendManager {
         }
         return $product;
     }
-
-    
 }
 ?>

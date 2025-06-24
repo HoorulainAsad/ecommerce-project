@@ -107,7 +107,15 @@ class ProductManager {
             error_log("ProductManager::updateProduct - Prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
             return false;
         }
-        $stmt->bind_param($types, ...$params);
+        // Use call_user_func_array for bind_param with dynamic parameters
+        $bind_names = array($types);
+        for ($i = 0; $i < count($params); $i++) {
+            $bind_name = 'bind' . $i;
+            $$bind_name = &$params[$i]; // Create a variable reference
+            $bind_names[] = &$$bind_name;
+        }
+        call_user_func_array(array($stmt, 'bind_param'), $bind_names);
+
         $result = $stmt->execute();
         $stmt->close();
         return $result;
@@ -258,13 +266,74 @@ class ProductManager {
         // If you want to allow negative stock, remove the 'AND stock >= ?' and the third bind_param.
         $stmt->bind_param("iii", $quantity, $productId, $quantity);
         $result = $stmt->execute();
-        
+
         if (!$result) {
             error_log("ProductManager::updateProductStock - Execute failed: (" . $stmt->errno . ") " . $stmt->error);
         }
 
         $stmt->close();
         return $result;
+    }
+
+    ---
+    ## New Method for Trending Products
+    ---
+
+    /**
+     * Fetches the top N trending products based on total quantity ordered within a time frame.
+     * Requires 'order_items' and 'orders' tables.
+     *
+     * @param int $limit The number of trending products to retrieve (default: 3).
+     * @param int $days The number of days to look back for orders (default: 30).
+     * @return array An array of trending product data.
+     */
+    public function getTrendyProducts($limit = 3, $days = 30) {
+        // It's crucial to use LEFT JOIN for 'categories' in case a product has no category assigned.
+        // For 'order_items' and 'orders', INNER JOIN is generally correct if you only want products that HAVE been ordered.
+        $sql = "SELECT
+                    p.id,
+                    p.name,
+                    p.description,
+                    p.price,
+                    p.image_url,
+                    p.stock,
+                    c.name AS category_name,
+                    SUM(oi.quantity) AS total_ordered_quantity
+                FROM
+                    products p
+                JOIN
+                    order_items oi ON p.id = oi.product_id
+                JOIN
+                    orders o ON oi.order_id = o.id
+                LEFT JOIN
+                    categories c ON p.category_id = c.id
+                WHERE
+                    o.order_date >= DATE_SUB(NOW(), INTERVAL ? DAY)
+                GROUP BY
+                    p.id, p.name, p.description, p.price, p.image_url, p.stock, c.name
+                ORDER BY
+                    total_ordered_quantity DESC
+                LIMIT ?";
+
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            error_log("ProductManager::getTrendyProducts - Prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
+            return []; // Return empty array on error
+        }
+
+        // Bind parameters: 'ii' for two integers ($days, $limit)
+        $stmt->bind_param("ii", $days, $limit);
+
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $trendyProducts = [];
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $trendyProducts[] = $row;
+            }
+        }
+        $stmt->close();
+        return $trendyProducts;
     }
 }
 ?>

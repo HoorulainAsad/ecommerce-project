@@ -48,7 +48,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
         $message_type = 'error';
     }
     // Redirect to clear GET parameters after deletion
-    redirectTo('viewproducts.php?msg=' . urlencode($message) . '&type=' . $message_type);
+    redirectToAdmin('viewproducts.php?msg=' . urlencode($message) . '&type=' . $message_type);
 }
 
 // Check for messages from redirects (e.g., after deletion or add product)
