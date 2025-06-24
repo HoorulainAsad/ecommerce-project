@@ -1,10 +1,6 @@
 <?php
 // index.php (Home Page)
 
-
-
-
-
 require_once __DIR__ . '/includes/header.php';
 require_once __DIR__ . '/classes/ProductFrontendManager.php';
 require_once __DIR__ . '/classes/CategoryFrontendManager.php';
@@ -27,57 +23,51 @@ $heroImages = [
 ?>
 
 <!-- Hero Section (Image Slider) -->
-<section class="hero-section">
+<section class="hero-section" style="position: relative; height: 90vh; overflow: hidden;">
     <?php foreach ($heroImages as $index => $image): ?>
-        <div class="hero-slide <?php echo ($index === 0) ? 'active' : ''; ?>" style="background-image: url('<?php echo $image; ?>');"></div>
+        <div class="hero-slide <?php echo ($index === 0) ? 'active' : ''; ?>" 
+             style="position:absolute; top:0; left:0; width:100%; height:100%; background-size:cover; background-position:center; transition: opacity 0.5s; opacity:<?php echo ($index === 0) ? '1' : '0'; ?>; background-image: url('<?php echo $image; ?>');">
+        </div>
     <?php endforeach; ?>
-    <div class="hero-overlay">
+
+    <div class="hero-overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; text-align: center; z-index: 2;">
         <h1>Elegance Redefined.</h1>
         <p>Discover your dream dress for every special occasion.</p>
         <a href="<?php echo BASE_URL; ?>category.php?name=all" class="btn hero-button">Shop Now</a>
     </div>
-    <div class="hero-indicators"></div>
+    <div class="hero-indicators" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 3;"></div>
 </section>
 
-<!-- All other sections remain unchanged from your original code -->
-<?php
-$allCategories = $categoryManager->getAllCategories();
-
-?>
+<?php $allCategories = $categoryManager->getAllCategories(); ?>
 
 <section class="category-section">
     <div class="container">
         <h2 class="section-heading">Explore By Categories</h2>
         <div class="oval-categories-grid">
-            <!-- Dynamic Categories -->
-             <?php
-                function getCategoryImage($categoryName) {
-                    $name = strtolower(trim($categoryName));
-                    $filename = $name . '.jpg'; // or .png depending on what you're using
-                    $path = 'assets/img/' . $filename;
+            <?php
+            function getCategoryImage($categoryName) {
+                $name = strtolower(trim($categoryName));
+                return WEB_ROOT_URL . 'assets/img/' . $name . '.jpg';
+            }
+            ?>
 
-                    // Use placeholder if image doesn't exist
-                    return WEB_ROOT_URL . $path;
-                }
-                ?>
-
-            <?php foreach ($allCategories as $category): ?>
-                <a href="<?php echo BASE_URL . 'category.php?name=' . urlencode($category['name']); ?>" class="category-oval-card">
-                    <div class="category-oval-image-wrapper">
-                        <div class="floral-border">
-        <img src="<?php echo getCategoryImage($category['name']); ?>" alt="<?php echo htmlspecialchars($category['name']); ?>" onerror="this.src='https://placehold.co/200x250?text=No+Image';">
+           <?php foreach ($allCategories as $category): ?>
+    <?php
+        $slug = strtolower(str_replace(' ', '_', trim($category['name']))); // clean slug
+    ?>
+    <a href="<?php echo BASE_URL . 'category.php?name=' . urlencode($slug); ?>" class="category-oval-card">
+        <div class="category-oval-image-wrapper">
+            <img src="<?php echo getCategoryImage($category['name']); ?>" alt="<?php echo htmlspecialchars($category['name']); ?>" onerror="this.src='https://placehold.co/200x250?text=No+Image';">
         </div>
-                    </div>
-                    <div class="category-oval-name"><?php echo htmlspecialchars($category['name']); ?></div>
-                </a>
-            <?php endforeach; ?>
+        <div class="category-oval-name"><?php echo htmlspecialchars($category['name']); ?></div>
+    </a>
+<?php endforeach; ?>
+
 
             <!-- New Arrivals -->
             <a href="<?php echo BASE_URL . 'category.php?name=new_arrivals'; ?>" class="category-oval-card">
                 <div class="category-oval-image-wrapper">
-                    <div class="floral-border">
-                    <img src="<?php echo WEB_ROOT_URL . 'images/new_arrivals_placeholder.png'; ?>" alt="New Arrivals" onerror="this.src='https://placehold.co/200x250?text=New+Arrivals';">
-                    </div>
+                    <img src="<?php echo WEB_ROOT_URL . 'assets/img/newarrivals.jpg'; ?>" alt="New Arrivals" onerror="this.src='https://placehold.co/200x250?text=New+Arrivals';">
                 </div>
                 <div class="category-oval-name">New Arrivals</div>
             </a>
@@ -85,19 +75,13 @@ $allCategories = $categoryManager->getAllCategories();
             <!-- Trending -->
             <a href="<?php echo BASE_URL . 'category.php?name=trendy'; ?>" class="category-oval-card">
                 <div class="category-oval-image-wrapper">
-                    <div class="floral-border">
-                    <img src="<?php echo WEB_ROOT_URL . 'images/trending_placeholder.png'; ?>" alt="Trending Products" onerror="this.src='https://placehold.co/200x250?text=Trending';">
-                     <img src="assets/img/floral-frame.png" class="floral-overlay">
-                    </div>
+                    <img src="<?php echo WEB_ROOT_URL . 'assets/img/trending.jpg'; ?>" alt="Trending Products" onerror="this.src='https://placehold.co/200x250?text=Trending';">
                 </div>
                 <div class="category-oval-name">Trending Products</div>
             </a>
         </div>
     </div>
 </section>
-
-
-
 
 <section class="shop-now-section">
     <div class="container-fluid container-xl">
@@ -108,7 +92,7 @@ $allCategories = $categoryManager->getAllCategories();
 
 <!-- Hero Slider Script -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const slides = document.querySelectorAll('.hero-slide');
         const indicatorsContainer = document.querySelector('.hero-indicators');
         let currentSlide = 0;
@@ -116,15 +100,11 @@ $allCategories = $categoryManager->getAllCategories();
 
         function showSlide(index) {
             slides.forEach((slide, i) => {
-                slide.classList.remove('active');
-                if (indicatorsContainer) {
-                    indicatorsContainer.children[i].classList.remove('active');
+                slide.style.opacity = (i === index) ? '1' : '0';
+                if (indicatorsContainer && indicatorsContainer.children[i]) {
+                    indicatorsContainer.children[i].classList.toggle('active', i === index);
                 }
             });
-            slides[index].classList.add('active');
-            if (indicatorsContainer) {
-                indicatorsContainer.children[index].classList.add('active');
-            }
         }
 
         function nextSlide() {
@@ -148,6 +128,12 @@ $allCategories = $categoryManager->getAllCategories();
                 slides.forEach((_, i) => {
                     const indicator = document.createElement('div');
                     indicator.classList.add('hero-indicator');
+                    indicator.style.width = '12px';
+                    indicator.style.height = '12px';
+                    indicator.style.borderRadius = '50%';
+                    indicator.style.background = '#fff';
+                    indicator.style.opacity = '0.6';
+                    indicator.style.cursor = 'pointer';
                     indicator.addEventListener('click', () => {
                         stopSlider();
                         currentSlide = i;

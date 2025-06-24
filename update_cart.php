@@ -22,11 +22,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($action === 'update_checked_status' || $action === 'increase' || $action === 'decrease' || $action === 'delete') {
             // For AJAX requests, send JSON response
             header('Content-Type: application/json');
-            echo json_encode([
-                'success' => $success,
-                'grand_total' => number_format($cartManager->getCheckedCartTotal(), 2) // Send updated total
-            ]);
-            exit; // Stop script execution after sending JSON
+                echo json_encode([
+                    'success' => $success,
+                    'grand_total' => (float)$cartManager->getCheckedCartTotal()
+                ]);
+                exit;
+// Stop script execution after sending JSON
         }
 
         // For non-AJAX requests (like the existing quantity forms)
