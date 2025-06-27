@@ -275,9 +275,7 @@ class ProductManager {
         return $result;
     }
 
-    ---
-    ## New Method for Trending Products
-    ---
+   
 
     /**
      * Fetches the top N trending products based on total quantity ordered within a time frame.

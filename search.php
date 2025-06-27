@@ -79,7 +79,9 @@ if (!empty($searchQuery)) {
             <?php foreach ($products as $product): ?>
                 <div class="col">
                     <div class="product-card">
-                        <img src="<?php echo BASE_URL . htmlspecialchars($product['image_url']); ?>" class="product-card-img" alt="<?php echo htmlspecialchars($product['name']); ?>" onerror="this.onerror=null;this.src='https://placehold.co/400x300/E0E0E0/555555?text=No+Image';">
+                        <div class="product-card-img-wrapper">
+                            <img src="<?php echo BASE_URL . htmlspecialchars($product['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" onerror="this.onerror=null;this.src='https://placehold.co/400x300/E0E0E0/555555?text=No+Image';">
+                        </div>
                         <div class="product-card-body">
                             <h4><?php echo htmlspecialchars($product['name']); ?></h4>
                             <p class="price">$<?php echo htmlspecialchars(number_format($product['price'], 2)); ?></p>
