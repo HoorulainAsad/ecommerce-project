@@ -1,8 +1,5 @@
 <?php
-// C:\xampp\htdocs\msgm_clothing\admin\includes\config.php
-// THIS IS YOUR CENTRAL CONFIGURATION FILE FOR BOTH FRONTEND AND ADMIN
 
-// Database Connection Constants - Wrapped in defined() for safety
 if (!defined('DB_HOST')) {
     define('DB_HOST', 'localhost');
 }
