@@ -68,7 +68,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
                 <div class="product-info-details">
                     <h1><?php echo htmlspecialchars($product['name']); ?></h1>
                     <p class="description"><?php echo nl2br(htmlspecialchars($product['description'])); ?></p>
-                    <p class="price">Rs. <?php echo number_format($product['price'], 0); ?></p>
+                    <p class="price">$<?php echo number_format($product['price'], 2); ?></p>
+
 
                     <p><strong>Category:</strong> <?php echo htmlspecialchars($product['category_name'] ?? 'N/A'); ?></p>
                     <p><strong>Availability:</strong>
