@@ -88,7 +88,7 @@ if (!isset($_GET['id'])) {
     <style>
         /* Custom styles based on the provided image */
         body {
-            font-family: 'Lora', serif; /* Primary font from the image */
+            font-family: "Lora" , monospace; /* Primary font from the image */
             background-color: #f8f5ed; /* Light beige background from the image */
         }
         h1, h2, h3, th {

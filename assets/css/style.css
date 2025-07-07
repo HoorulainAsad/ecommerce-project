@@ -32,20 +32,20 @@ html, body {
 
 body {
     font-family: 'Playfair Display', serif;
-    background-color: #dcd8d3; /* Light background from palette */
-    color: #2e2e2e; /* Dark text from palette */
+    background-color: #dcd8d3; 
+    color: #2e2e2e; 
     line-height: 1.6;
     margin: 0;
     padding: 0;
     overflow-x: hidden; /* Prevent horizontal scroll */
-    min-height: 100vh; /* For sticky footer */
-    display: flex; /* For sticky footer */
-    flex-direction: column; /* For sticky footer */
+    min-height: 100vh; 
+    display: flex; 
+    flex-direction: column; 
 }
 
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Playfair Display', serif;
-    color: #7f0e10; /* Dark red from palette */
+    color: #7f0e10; 
     margin-bottom: 1rem;
 }
 
@@ -917,9 +917,9 @@ footer.footer-custom .social-icons i {
         flex: 0 0 calc(50% - 20px); /* 2 items per row on medium screens */
     }
 
-    /* Zigzag Categories - stack vertically on smaller screens */
+   
     .zigzag-item {
-        flex-direction: column !important; /* Force column layout */
+        flex-direction: column !important; 
         text-align: center;
     }
     .zigzag-item img, .zigzag-text {
@@ -927,7 +927,7 @@ footer.footer-custom .social-icons i {
         height: auto; /* Allow height to adjust */
     }
     .zigzag-text {
-        padding: 25px; /* Adjusted padding */
+        padding: 25px; 
     }
     .zigzag-text h3 {
         font-size: 1.6rem;

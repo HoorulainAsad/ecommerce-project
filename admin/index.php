@@ -7,27 +7,24 @@ require_once __DIR__ . '/classes/OrderManager.php';
 require_once __DIR__ . '/classes/UserManager.php';
 require_once __DIR__ . '/classes/ReviewManager.php';
 
-// Check if admin is logged in, otherwise redirect to login page
 if (!isLoggedIn()) {
     redirectToAdmin('login.php');
 }
 
-// Instantiate managers to fetch data for dashboard counts
+$adminUsername = $_SESSION[ADMIN_USERNAME_SESSION_KEY] ?? 'Admin';
+$adminRole = $_SESSION[ADMIN_ROLE_SESSION_KEY] ?? 'admin';
+
 $productManager = new ProductManager();
 $orderManager = new OrderManager();
 $userManager = new UserManager();
 $reviewManager = new ReviewManager();
 
-// Fetch dashboard data
-// Ensure these methods exist in your manager classes
 $totalProducts = $productManager->getTotalProductCount();
 $totalOrders = $orderManager->getTotalOrdersCount();
 $totalUsers = $userManager->getTotalUsersCount();
 $newArrivalsCount = $productManager->getNewArrivalsCount();
 $trendyCollectionCount = $orderManager->getTrendyProductsCount();
 $pendingReviews = $reviewManager->getReviewCountByStatus('Pending');
-
-// No explicit unset calls needed here, as the database.php's register_shutdown_function will handle closing.
 
 ?>
 <!DOCTYPE html>
@@ -38,11 +35,39 @@ $pendingReviews = $reviewManager->getReviewCountByStatus('Pending');
     <title>Admin Dashboard - MSGM Bridal</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Anonymous+Pro:ital,wght@0,400;0,700;1,400;1,700&family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Link to your external stylesheet -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>admin/assets/css/styles.css?v=2">
 
+    <style>
+        .admin-info {
+            background-color: #e9ecef;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            text-align: left;
+            border-left: 5px solid #7f0e10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .admin-info p {
+            margin: 0;
+            font-size: 1.1em;
+            color: #343a40;
+        }
+        .admin-info strong {
+            color: #7f0e10;
+        }
+        .admin-info .role-badge {
+            background-color: #7f0e10;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+            text-transform: capitalize;
+        }
+    </style>
 </head>
 <body>
     <div class="admin-wrapper">
@@ -52,6 +77,11 @@ $pendingReviews = $reviewManager->getReviewCountByStatus('Pending');
             <?php include 'navbar.php'; ?>
 
             <h1 class="page-header">Dashboard</h1>
+
+            <div class="admin-info">
+                <p>Logged in as: <strong><?php echo htmlspecialchars($adminUsername); ?></strong></p>
+                <span class="role-badge"><?php echo htmlspecialchars(ucfirst($adminRole)); ?></span>
+            </div>
 
             <div class="dashboard-stats">
                 <a href="<?php echo BASE_URL; ?>admin/viewproducts.php" class="stat-card-link">
@@ -82,11 +112,16 @@ $pendingReviews = $reviewManager->getReviewCountByStatus('Pending');
                 <a href="<?php echo BASE_URL; ?>admin/customerfeedback.php?filter=pending" class="stat-card-link">
                     <i class="fas fa-comments icon"></i>
                     <div class="value"><?php echo $pendingReviews; ?></div>
-                    <div class="label">Pending Reviews</div>
+                    <div class="label">Reviews</div>
                 </a>
             </div>
 
             <div class="dashboard-actions">
+                <?php if (isSuperAdmin()): ?>
+                    <a href="<?php echo BASE_URL; ?>admin/add_admin.php" class="action-button primary">
+                        <i class="fas fa-user-plus"></i> Add New Admin
+                    </a>
+                <?php endif; ?>
                 <a href="<?php echo BASE_URL; ?>admin/addproduct.php" class="action-button primary">
                     <i class="fas fa-plus-circle"></i> Add New Product
                 </a>

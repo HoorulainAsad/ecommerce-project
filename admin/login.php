@@ -22,7 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = true;
     } else {
         $conn = getDbConnection(); // Get database connection
-        $sql = "SELECT id, username, password FROM admin_users WHERE username = ?";
+        // Select id, username, password, and the new 'role' column
+        $sql = "SELECT id, username, password, role FROM admin_users WHERE username = ?";
         $stmt = $conn->prepare($sql);
         
         if ($stmt) {
@@ -35,7 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Verify the hashed password
                 if (password_verify($password, $user['password'])) {
                     $_SESSION[ADMIN_SESSION_KEY] = true;
+                    $_SESSION[ADMIN_ID_SESSION_KEY] = $user['id']; // Store admin ID
                     $_SESSION[ADMIN_USERNAME_SESSION_KEY] = $user['username'];
+                    $_SESSION[ADMIN_ROLE_SESSION_KEY] = $user['role']; // Store the admin's role
                     $stmt->close();
                     // No need to close connection - shutdown function will handle it
                     redirectToAdmin('index.php'); // Redirect to dashboard on successful login
@@ -71,9 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="login-container">
         <h2>Admin Login</h2>
         <?php if ($message): ?>
-            <div class="error-message">
-                <?php echo htmlspecialchars($message); ?>
-            </div>
+            <?php displayMessage($message, $error); ?>
         <?php endif; ?>
         <form action="login.php" method="POST">
             <div class="form-group">

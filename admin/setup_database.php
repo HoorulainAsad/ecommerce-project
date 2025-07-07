@@ -130,33 +130,31 @@ if ($conn->query($sql_create_admin_users_table) === TRUE) {
     echo "Table 'admin_users' created or already exists.<br>";
 
     // Insert a default admin user if one doesn't exist
-    $default_username = 'admin';
-    $default_password = password_hash('password123', PASSWORD_DEFAULT); // Hashed password
+$default_username = 'admin';
+$default_password = password_hash('password123', PASSWORD_DEFAULT); // Hashed password
+$default_role = 'super_admin'; // Assign 'super_admin' role to the initial admin
 
-    $check_admin_sql = "SELECT id FROM admin_users WHERE username = ?";
-    $stmt_check_admin = $conn->prepare($check_admin_sql);
-    $stmt_check_admin->bind_param("s", $default_username);
-    $stmt_check_admin->execute();
-    $stmt_check_admin->store_result();
+$check_admin_sql = "SELECT id FROM admin_users WHERE username = ?";
+$stmt_check_admin = $conn->prepare($check_admin_sql);
+$stmt_check_admin->bind_param("s", $default_username);
+$stmt_check_admin->execute();
+$stmt_check_admin->store_result();
 
-    if ($stmt_check_admin->num_rows == 0) {
-        $insert_admin_sql = "INSERT INTO admin_users (username, password) VALUES (?, ?)";
-        $stmt_insert_admin = $conn->prepare($insert_admin_sql);
-        $stmt_insert_admin->bind_param("ss", $default_username, $default_password);
-        if ($stmt_insert_admin->execute()) {
-            echo "Default admin user ('admin'/'password123') created. Please change this password immediately!<br>";
-        } else {
-            echo "Error creating default admin user: " . $stmt_insert_admin->error . "<br>";
-        }
-        $stmt_insert_admin->close();
+if ($stmt_check_admin->num_rows == 0) {
+    // Ensure the 'role' column is included in the INSERT statement
+    $insert_admin_sql = "INSERT INTO admin_users (username, password, role) VALUES (?, ?, ?)";
+    $stmt_insert_admin = $conn->prepare($insert_admin_sql);
+    $stmt_insert_admin->bind_param("sss", $default_username, $default_password, $default_role);
+    if ($stmt_insert_admin->execute()) {
+        echo "Default super admin user ('admin'/'password123') created. Please change this password immediately!<br>";
     } else {
-        echo "Default admin user already exists.<br>";
+        echo "Error creating default admin user: " . $stmt_insert_admin->error . "<br>";
     }
-    $stmt_check_admin->close();
-
+    $stmt_insert_admin->close();
 } else {
-    echo "Error creating table 'admin_users': " . $conn->error . "<br>";
+    echo "Default admin user already exists.<br>";
 }
+$stmt_check_admin->close();
 
 // --- Create Users Table (for customer accounts on the main website) ---
 $sql_create_users_table = "
