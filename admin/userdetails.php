@@ -4,7 +4,6 @@
 require_once __DIR__ . '/includes/functions.php'; // Includes config and starts session
 require_once __DIR__ . '/classes/UserManager.php';
 
-// Check if admin is logged in
 if (!isLoggedIn()) {
     redirectToAdmin('login.php');
 }
@@ -12,7 +11,6 @@ if (!isLoggedIn()) {
 $userManager = new UserManager();
 $users = $userManager->getAllUsers();
 
-// No explicit unset($userManager) needed here, destructor will handle it.
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -43,7 +41,6 @@ $users = $userManager->getAllUsers();
                             <th>Username</th>
                             <th>Email</th>
                             <th>Registered On</th>
-                            <!-- Add more columns if your users table has more data -->
                         </tr>
                     </thead>
                     <tbody>

@@ -1,7 +1,7 @@
 <?php
 // C:\xampp\htdocs\msgm_clothing\classes\ReviewManager.php
 
-require_once __DIR__ . '/../includes/database.php'; // Correct path to your database.php
+require_once __DIR__ . '/../includes/database.php'; 
 
 class ReviewManager {
     private $conn;
@@ -34,22 +34,14 @@ class ReviewManager {
             return false;
         }
 
-        // Note: Check your 'reviews' table columns. If 'user_id' or 'product_id' are not nullable
-        // and you're passing null, it might cause issues.
-        // Assuming 'i' for order_id, 'i' for product_id, 's' for customer_name, 'i' for rating,
-        // 's' for comment, 's' for customer_email, 'i' for user_id.
+       
         $stmt->bind_param("iisisss", $orderId, $productId, $customerName, $rating, $comment, $customerEmail, $userId);
         $result = $stmt->execute();
         $stmt->close();
         return $result;
     }
 
-    /**
-     * Updates the status of a review.
-     * @param int $reviewId The ID of the review.
-     * @param string $newStatus The new status ('approved', 'rejected', 'pending').
-     * @return bool True on success, false on failure.
-     */
+    
     public function updateReviewStatus($reviewId, $newStatus) {
         $sql = "UPDATE reviews SET status = ? WHERE id = ?";
         $stmt = $this->conn->prepare($sql);
@@ -63,11 +55,7 @@ class ReviewManager {
         return $result;
     }
 
-    /**
-     * Retrieves all reviews, optionally filtered by status.
-     * @param string $statusFilter 'all', 'pending', 'approved', 'rejected'.
-     * @return array An array of review associative arrays.
-     */
+   
     public function getAllReviews($statusFilter = 'all') {
         $sql = "SELECT r.*, p.name AS product_name, u.username AS customer_username
                 FROM reviews r
@@ -107,11 +95,7 @@ class ReviewManager {
         return $reviews;
     }
 
-    /**
-     * Gets the count of reviews by status.
-     * @param string $status The status to count (e.g., 'pending', 'approved').
-     * @return int The total number of reviews with that status.
-     */
+    
     public function getReviewCountByStatus($status = 'pending') {
         $sql = "SELECT COUNT(*) as total FROM reviews WHERE status = ?";
         $stmt = $this->conn->prepare($sql);
@@ -129,12 +113,7 @@ class ReviewManager {
         return $total;
     }
 
-    /**
-     * Deletes a review from the database.
-     * THIS IS THE MISSING METHOD!
-     * @param int $reviewId The ID of the review to delete.
-     * @return bool True on success, false on failure.
-     */
+    
     public function deleteReview($reviewId) {
         $sql = "DELETE FROM reviews WHERE id = ?";
         $stmt = $this->conn->prepare($sql);

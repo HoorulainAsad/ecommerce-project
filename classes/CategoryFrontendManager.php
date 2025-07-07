@@ -1,7 +1,6 @@
 <?php
 // classes/CategoryFrontendManager.php
 
-// In C:\xampp\htdocs\msgm_clothing\classes\CartManager.php
 require_once __DIR__ . '/../admin/includes/database.php';
 
 class CategoryFrontendManager {

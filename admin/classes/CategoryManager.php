@@ -1,6 +1,5 @@
 <?php
-// admin/classes/CategoryManager.php
-
+//admin/classes/CategoryManager.php
 require_once __DIR__ . '/../includes/database.php';
 
 class CategoryManager {
@@ -10,22 +9,12 @@ class CategoryManager {
         $this->conn = getDbConnection();
     }
 
-    // ... (rest of your CategoryManager methods) ...
-
-    // IMPORTANT: Ensure this __destruct() method is ABSENT or commented out if it tries to close the connection.
-    /*
-    public function __destruct() {
-        // Do NOT close the connection here. It's managed globally.
-    }
-    */
-
-    /**
-     * Adds a new category to the database.
-     * @param string $name The name of the category.
-     * @return bool True on success, false on failure (e.g., category already exists).
-     */
     public function addCategory($name) {
-        // Check if category already exists
+        if (empty($name)) {
+            error_log("CategoryManager::addCategory - Category name cannot be empty.");
+            return false;
+        }
+        
         $checkSql = "SELECT id FROM categories WHERE name = ?";
         $stmtCheck = $this->conn->prepare($checkSql);
         if (!$stmtCheck) {
@@ -36,7 +25,6 @@ class CategoryManager {
         $stmtCheck->execute();
         $resultCheck = $stmtCheck->get_result();
         if ($resultCheck->num_rows > 0) {
-            // Category with this name already exists
             $stmtCheck->close();
             return false;
         }
@@ -54,10 +42,6 @@ class CategoryManager {
         return $result;
     }
 
-    /**
-     * Retrieves all categories from the database.
-     * @return array An array of category associative arrays.
-     */
     public function getAllCategories() {
         $sql = "SELECT * FROM categories ORDER BY name ASC";
         $result = $this->conn->query($sql);
@@ -70,11 +54,6 @@ class CategoryManager {
         return $categories;
     }
 
-    /**
-     * Retrieves a category by its ID.
-     * @param int $categoryId
-     * @return array|null An associative array of category data, or null if not found.
-     */
     public function getCategoryById($categoryId) {
         $sql = "SELECT * FROM categories WHERE id = ?";
         $stmt = $this->conn->prepare($sql);
@@ -90,14 +69,12 @@ class CategoryManager {
         return $category;
     }
 
-    /**
-     * Updates an existing category.
-     * @param int $id The ID of the category.
-     * @param string $name The new name for the category.
-     * @return bool True on success, false on failure.
-     */
     public function updateCategory($id, $name) {
-        // Check if a category with the new name already exists (excluding the current category being updated)
+        if (empty($name)) {
+            error_log("CategoryManager::updateCategory - Category name cannot be empty.");
+            return false;
+        }
+
         $checkSql = "SELECT id FROM categories WHERE name = ? AND id != ?";
         $stmtCheck = $this->conn->prepare($checkSql);
         if (!$stmtCheck) {
@@ -108,7 +85,6 @@ class CategoryManager {
         $stmtCheck->execute();
         $resultCheck = $stmtCheck->get_result();
         if ($resultCheck->num_rows > 0) {
-            // A different category with this name already exists
             $stmtCheck->close();
             return false;
         }
@@ -126,14 +102,6 @@ class CategoryManager {
         return $result;
     }
 
-    /**
-     * Deletes a category by its ID.
-     * Note: This will fail if there are products associated with this category
-     * due to foreign key constraints (ON DELETE RESTRICT).
-     * You would need to reassign products or delete them first.
-     * @param int $categoryId
-     * @return bool True on success, false on failure.
-     */
     public function deleteCategory($categoryId) {
         $sql = "DELETE FROM categories WHERE id = ?";
         $stmt = $this->conn->prepare($sql);
@@ -147,10 +115,8 @@ class CategoryManager {
             $stmt->close();
             return $result;
         } catch (mysqli_sql_exception $e) {
-            // Catch foreign key constraint violation
-            if ($e->getCode() == 1451) { // Error code for "Cannot delete or update a parent row: a foreign key constraint fails"
+            if ($e->getCode() == 1451) {
                 error_log("Cannot delete category ID {$categoryId}: Products are still assigned to it. Please reassign or delete products first.");
-                // You might return a specific error code or message to the UI here
                 return false;
             }
             error_log("CategoryManager::deleteCategory - Delete failed: " . $e->getMessage());
@@ -158,4 +124,3 @@ class CategoryManager {
         }
     }
 }
-?>

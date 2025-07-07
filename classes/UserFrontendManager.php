@@ -1,7 +1,6 @@
 <?php
 // classes/UserFrontendManager.php
 
-// In C:\xampp\htdocs\msgm_clothing\classes\CartManager.php
 require_once __DIR__ . '/../admin/includes/database.php';
 
 class UserFrontendManager {
@@ -19,7 +18,6 @@ class UserFrontendManager {
      * @return bool True on success, false if user/email already exists or on error.
      */
     public function registerUser($username, $email, $password) {
-        // Check if username or email already exists
         $checkSql = "SELECT id FROM users WHERE username = ? OR email = ?";
         $stmtCheck = $this->conn->prepare($checkSql);
         if (!$stmtCheck) {

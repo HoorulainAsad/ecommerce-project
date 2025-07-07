@@ -3,12 +3,12 @@
 
 require_once __DIR__ . '/includes/header.php'; // Includes functions.php and starts session
 require_once __DIR__ . '/classes/ProductFrontendManager.php';
-require_once __DIR__ . '/classes/CategoryFrontendManager.php'; // To get category name
+require_once __DIR__ . '/classes/CategoryFrontendManager.php'; 
 
 $productManager = new ProductFrontendManager();
 $categoryManager = new CategoryFrontendManager();
 
-$filter = sanitizeInput($_GET['name'] ?? 'all'); // Get filter from URL, default to 'all'
+$filter = sanitizeInput($_GET['name'] ?? 'all'); 
 $products = [];
 $pageTitle = "All Products";
 
@@ -60,7 +60,7 @@ switch (strtolower($filter)) {
             </div>
             <div class="product-card-body">
                 <h4><?php echo htmlspecialchars($product['name']); ?></h4>
-                <p class="price">$<?php echo htmlspecialchars(number_format($product['price'], 2)); ?></p>
+                <p class="price">Rs.<?php echo htmlspecialchars(number_format($product['price'], 2)); ?></p>
                 <?php if ($product['is_out_of_stock']): ?>
                     <span class="out-of-stock-badge">Out of Stock</span>
                 <?php else: ?>

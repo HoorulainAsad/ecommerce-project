@@ -49,8 +49,8 @@ $initialCheckedGrandTotal = $cartManager->getCheckedCartTotal(); // Get initial 
                                 <button type="submit" class="btn btn-sm btn-outline-secondary">+</button>
                             </form>
                         </td>
-                        <td>$<span class="item-price"><?php echo number_format($item['price'], 2); ?></span></td>
-                        <td>$<span class="item-total"><?php echo number_format($item['price'] * $item['quantity'], 2); ?></span></td>
+                        <td>Rs.<span class="item-price"><?php echo number_format($item['price'], 2); ?></span></td>
+                        <td>Rs.<span class="item-total"><?php echo number_format($item['price'] * $item['quantity'], 2); ?></span></td>
                         <td>
                             <form method="POST" action="update_cart.php" class="delete-item-form">
                                 <input type="hidden" name="cart_id" value="<?php echo $item['id']; ?>">
@@ -64,7 +64,7 @@ $initialCheckedGrandTotal = $cartManager->getCheckedCartTotal(); // Get initial 
             <tfoot>
                 <tr>
                     <td colspan="5" class="text-end fw-bold">Grand Total (Selected Items):</td>
-                    <td colspan="2" class="fw-bold">$<span id="grand-total"><?php echo number_format((float)$initialCheckedGrandTotal, 2, '.', ''); ?></span>
+                    <td colspan="2" class="fw-bold">Rs.<span id="grand-total"><?php echo number_format((float)$initialCheckedGrandTotal, 2, '.', ''); ?></span>
 </td>
                     <td></td>
                 </tr>
@@ -106,7 +106,7 @@ $(document).ready(function() {
         const isChecked = $(this).is(':checked');
 
         $.ajax({
-            url: 'update_cart.php', // Your existing update_cart.php
+            url: 'update_cart.php', 
             method: 'POST',
             data: {
                 action: 'update_checked_status',
@@ -119,13 +119,11 @@ $(document).ready(function() {
                     updateGrandTotalDisplay(response.grand_total);
                 } else {
                     alert('Failed to update item selection.');
-                    // Revert checkbox state if update failed on server
                     $(this).prop('checked', !isChecked);
                 }
             },
             error: function() {
                 alert('Error communicating with the server.');
-                // Revert checkbox state on network error
                 $(this).prop('checked', !isChecked);
             }
         });
@@ -133,8 +131,7 @@ $(document).ready(function() {
 
     // Enhance quantity update forms to use AJAX
     $('.update-quantity-form').on('submit', function(e) {
-        e.preventDefault(); // Prevent default form submission
-
+        e.preventDefault(); 
         const form = $(this);
         const cartId = form.find('input[name="cart_id"]').val();
         const action = form.find('input[name="action"]').val();
@@ -147,7 +144,7 @@ $(document).ready(function() {
         $.ajax({
             url: 'update_cart.php',
             method: 'POST',
-            data: form.serialize(), // Serialize form data
+            data: form.serialize(), 
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
@@ -165,11 +162,9 @@ $(document).ready(function() {
                     // Update grand total display (from server response)
                     updateGrandTotalDisplay(response.grand_total);
 
-                    // If quantity becomes 0 (after decrease to 1 then another decrease)
-                    // You might want to remove the row from the DOM
+                    
                     if (currentQuantity === 0 && action === 'decrease') {
                         currentRow.remove();
-                        // Re-check if cart is empty after removal (optional, but good UX)
                         if ($('.cart-item-checkbox').length === 0) {
                             $('.container.py-5').html('<p>Your cart is empty.</p>');
                         }
@@ -198,16 +193,13 @@ $(document).ready(function() {
         $.ajax({
             url: 'update_cart.php',
             method: 'POST',
-            data: form.serialize(), // Serialize form data (cart_id, action=delete)
+            data: form.serialize(), 
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
-                    currentRow.remove(); // Remove the row from the table
-
-                    // Update grand total display (from server response)
+                    currentRow.remove(); 
                     updateGrandTotalDisplay(response.grand_total);
 
-                    // Check if cart is now empty
                     if ($('.cart-item-checkbox').length === 0) {
                         $('.container.py-5').html('<p>Your cart is empty.</p>');
                     }
@@ -221,7 +213,6 @@ $(document).ready(function() {
         });
     });
 
-    // Initial check for checkout button state
     updateGrandTotalDisplay(parseFloat($('#grand-total').text()));
 });
 </script>

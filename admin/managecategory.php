@@ -16,7 +16,7 @@ $productManager = new ProductManager(); // Initialize ProductManager
 $message = '';
 $message_type = ''; // success or error
 
-// Define the main categories that are allowed to be managed
+// Define the main categories that are allowed to be managed (still used for display logic)
 $allowed_main_categories = ['FORMAL', 'PARTYWEAR', 'BRIDAL'];
 
 // Handle Add Category Form Submission
@@ -26,15 +26,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_category'])) {
     if (empty($categoryName)) {
         $message = "Category name cannot be empty.";
         $message_type = 'error';
-    } elseif (!in_array($categoryName, $allowed_main_categories)) {
-        $message = "Only 'FORMAL', 'PARTYWEAR', and 'BRIDAL' can be added as main categories through this panel.";
-        $message_type = 'error';
     } else {
+        // Removed the check: !in_array($categoryName, $allowed_main_categories)
+        // Now, any valid, non-empty, non-duplicate category name can be added.
         if ($categoryManager->addCategory($categoryName)) {
             $message = "Category '" . htmlspecialchars($categoryName) . "' added successfully!";
             $message_type = 'success';
         } else {
-            $message = "Error adding category. It might already exist.";
+            // This error typically means the category already exists or a database error occurred.
+            $message = "Error adding category. It might already exist or a database error occurred.";
             $message_type = 'error';
         }
     }
@@ -72,24 +72,23 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
             }
         }
     }
-    // Redirect to clear GET parameters after deletion
     redirectToAdmin('managecategory.php?msg=' . urlencode($message) . '&type=' . $message_type);
 }
 
-// Check for messages from redirects (e.g., after deletion)
 if (isset($_GET['msg']) && isset($_GET['type'])) {
     $message = sanitizeInput($_GET['msg']);
     $message_type = sanitizeInput($_GET['type']);
 }
 
-// Fetch all main categories for display and looping through them
-$allMainCategories = $categoryManager->getAllCategories();
-$mainCategoriesToDisplay = array_filter($allMainCategories, function($cat) use ($allowed_main_categories) {
+// Fetch all categories for display
+$allCategories = $categoryManager->getAllCategories();
+
+// Separate main categories from other categories for display purposes
+$mainCategoriesToDisplay = array_filter($allCategories, function($cat) use ($allowed_main_categories) {
     return in_array(strtoupper($cat['name']), $allowed_main_categories);
 });
 
-// Also fetch any other (non-main) categories for displaying and potential deletion
-$otherCategoriesToDisplay = array_filter($allMainCategories, function($cat) use ($allowed_main_categories) {
+$otherCategoriesToDisplay = array_filter($allCategories, function($cat) use ($allowed_main_categories) {
     return !in_array(strtoupper($cat['name']), $allowed_main_categories);
 });
 
@@ -104,29 +103,7 @@ $otherCategoriesToDisplay = array_filter($allMainCategories, function($cat) use 
     <link href="https://fonts.googleapis.com/css2?family=Anonymous+Pro:ital,wght@0,400;0,700;1,400;1,700&family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>admin/assets/css/styles.css">
-    <!-- <style>
-        .category-section {
-            background-color: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            margin-bottom: 30px;
-        }
-        .category-section h3 {
-            color: #A0522D;
-            margin-bottom: 20px;
-            font-size: 22px;
-            font-weight: 600;
-        }
-        .category-section h4 {
-            color: #8B4513;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            font-size: 20px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-    </style> -->
+    
 </head>
 <body>
     <div class="admin-wrapper">
@@ -142,10 +119,10 @@ $otherCategoriesToDisplay = array_filter($allMainCategories, function($cat) use 
             <?php endif; ?>
 
             <div class="form-section">
-                <h3>Add New Main Category</h3>
+                <h3>Add New Category</h3>
                 <form action="managecategory.php" method="POST">
                     <div class="form-group">
-                        <label for="category_name">Category Name (FORMAL, PARTYWEAR, BRIDAL only):</label>
+                        <label for="category_name">Category Name:</label>
                         <input type="text" id="category_name" name="category_name" required>
                     </div>
                     <button type="submit" name="add_category" class="submit-btn">Add Category</button>
@@ -184,7 +161,7 @@ $otherCategoriesToDisplay = array_filter($allMainCategories, function($cat) use 
                                                 <?php endif; ?>
                                             </td>
                                             <td data-label="Name"><?php echo htmlspecialchars($product['name']); ?></td>
-                                            <td data-label="Price">$<?php echo htmlspecialchars(number_format($product['price'], 2)); ?></td>
+                                            <td data-label="Price">Rs.<?php echo htmlspecialchars(number_format($product['price'], 2)); ?></td>
                                             <td data-label="Stock Status">
                                                 <?php if ($product['stock'] <= 0): ?>
                                                     <span class="out-of-stock-label">Out of Stock</span>

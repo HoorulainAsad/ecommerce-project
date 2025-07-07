@@ -4,7 +4,6 @@
 require_once __DIR__ . '/includes/header.php'; // Includes functions.php and starts session
 require_once __DIR__ . '/classes/UserFrontendManager.php';
 
-// If user is already logged in, redirect to home or profile
 if (isUserLoggedIn()) {
     redirectTo('index.php');
 }
@@ -15,7 +14,7 @@ $message_type = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = sanitizeInput($_POST['email'] ?? '');
-    $password = $_POST['password'] ?? ''; // Do not sanitize password before hashing/verification
+    $password = $_POST['password'] ?? ''; 
 
     if (empty($email) || empty($password)) {
         $message = "Please enter both email and password.";
@@ -23,11 +22,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $user = $userFrontendManager->authenticateUser($email, $password);
         if ($user) {
-            // Set session variables for logged-in user
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['email'] = $user['email'];
-            redirectTo('index.php'); // Redirect to homepage or user dashboard
+            redirectTo('index.php'); 
         } else {
             $message = "Invalid email or password.";
             $message_type = 'error';
@@ -61,6 +59,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </div>
 
-<?php
-// No footer include here as the body is handled by the container styling
-?>
+

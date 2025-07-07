@@ -1,15 +1,9 @@
 <?php
 // admin/setup_database.php
 
-// IMPORTANT: Run this file ONCE to set up your database and tables.
-// After successful execution, it's recommended to delete or rename this file for security.
-
-// Include configuration for database connection details
 require_once __DIR__ . '/includes/config.php';
 
-// --- Database Connection for Initial Creation ---
-// Connect to MySQL server without specifying a database first,
-// as we need to create the database itself.
+
 $conn = new mysqli(DB_HOST, DB_USER, DB_PASS);
 
 // Check connection
@@ -29,7 +23,7 @@ if ($conn->query($sql_create_db) === TRUE) {
     exit();
 }
 
-// Select the newly created database
+
 $conn->select_db(DB_NAME);
 
 // --- Create Categories Table ---
@@ -45,8 +39,7 @@ if ($conn->query($sql_create_categories_table) === TRUE) {
     echo "Error creating table 'categories': " . $conn->error . "<br>";
 }
 
-// --- Insert/Ensure ONLY Main Categories ---
-// First, delete any categories that are NOT the main ones (like 'TRENDY', 'NEW ARRIVALS')
+
 $main_categories = ['FORMAL', 'PARTYWEAR', 'BRIDAL'];
 $delete_sql = "DELETE FROM categories WHERE name NOT IN ('" . implode("','", $main_categories) . "')";
 if ($conn->query($delete_sql) === TRUE) {
@@ -131,7 +124,7 @@ if ($conn->query($sql_create_admin_users_table) === TRUE) {
 
     // Insert a default admin user if one doesn't exist
 $default_username = 'admin';
-$default_password = password_hash('password123', PASSWORD_DEFAULT); // Hashed password
+$default_password = password_hash('password123', PASSWORD_DEFAULT); 
 $default_role = 'super_admin'; // Assign 'super_admin' role to the initial admin
 
 $check_admin_sql = "SELECT id FROM admin_users WHERE username = ?";
@@ -141,7 +134,7 @@ $stmt_check_admin->execute();
 $stmt_check_admin->store_result();
 
 if ($stmt_check_admin->num_rows == 0) {
-    // Ensure the 'role' column is included in the INSERT statement
+    
     $insert_admin_sql = "INSERT INTO admin_users (username, password, role) VALUES (?, ?, ?)";
     $stmt_insert_admin = $conn->prepare($insert_admin_sql);
     $stmt_insert_admin->bind_param("sss", $default_username, $default_password, $default_role);

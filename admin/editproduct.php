@@ -7,7 +7,7 @@ require_once __DIR__ . '/classes/CategoryManager.php';
 
 // Check if admin is logged in
 if (!isLoggedIn()) {
-    // Assuming redirectToAdmin exists in functions.php and directs to admin/login.php
+    
     redirectToAdmin('login.php');
 }
 
@@ -15,17 +15,14 @@ $productManager = new ProductManager();
 $categoryManager = new CategoryManager();
 
 $message = '';
-$message_type = ''; // success or error
+$message_type = ''; 
 
-// --- CORRECTED: Define upload directory relative to the PROJECT ROOT ---
-// __DIR__ is /path/to/your_project_root/admin/
-// dirname(__DIR__) goes up one level to /path/to/your_project_root/
-// Then we append '/uploads/products/' to get /path/to/your_project_root/uploads/products/
+
 $uploadDir = dirname(__DIR__) . '/uploads/products/';
 
 // Ensure the directory exists and has correct permissions
 if (!is_dir($uploadDir)) {
-    mkdir($uploadDir, 0755, true); // 0755 is generally safe. Ensure web server user has write access.
+    mkdir($uploadDir, 0755, true); 
 }
 
 // Get product ID from GET parameter for editing
@@ -45,7 +42,7 @@ $description = $editProduct['description'];
 $price = $editProduct['price'];
 $categoryId = $editProduct['category_id'];
 $stock = $editProduct['stock'];
-$currentImageUrl = $editProduct['image_url']; // Keep track of current image from DB
+$currentImageUrl = $editProduct['image_url']; 
 
 // Handle form submission for update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -55,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $categoryId = filter_var($_POST['category_id'] ?? 0, FILTER_VALIDATE_INT);
     $stock = filter_var($_POST['stock'] ?? 0, FILTER_VALIDATE_INT);
 
-    $imageUrlToSave = $currentImageUrl; // Default to current image if no new file uploaded
+    $imageUrlToSave = $currentImageUrl; 
 
     // --- File Upload Handling ---
     if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] === UPLOAD_ERR_OK) {
@@ -72,23 +69,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (in_array($fileExt, $allowed)) {
             if ($fileError === 0) {
                 if ($fileSize < 5000000) { // Max 5MB file size
-                    $newFileName = uniqid('product_', true) . "." . $fileExt; // Generate unique file name
+                    $newFileName = uniqid('product_', true) . "." . $fileExt; 
                     $fileDestination = $uploadDir . $newFileName;
 
                     if (move_uploaded_file($fileTmpName, $fileDestination)) {
-                        // Delete old image if a new one is successfully uploaded
+                        
                         if (!empty($currentImageUrl) && file_exists(dirname(__DIR__) . '/' . $currentImageUrl)) {
                             $oldFilePath = dirname(__DIR__) . '/' . $currentImageUrl;
                             if (is_file($oldFilePath)) { // Double-check it's a file
                                 unlink($oldFilePath);
                             }
                         }
-                        // --- CORRECTED: Path saved to DB should be relative to BASE_URL (project root) ---
+                       
                         $imageUrlToSave = 'uploads/products/' . $newFileName;
                     } else {
                         $message = "Error uploading new file. Check folder permissions.";
                         $message_type = 'error';
-                        // Keep current image if new upload failed
+                        
                         $imageUrlToSave = $currentImageUrl;
                     }
                 } else {
@@ -110,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $imageUrlToSave = $currentImageUrl;
         }
     } else if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] !== UPLOAD_ERR_NO_FILE) {
-        // Handle other upload errors (e.g., file exceeds POST_MAX_SIZE, etc.)
+        
         $message = "File upload error: " . $_FILES['product_image']['error'] . ". Please check file size.";
         $message_type = 'error';
         // Keep current image if an upload error occurred
@@ -123,18 +120,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = "Please fill all required fields correctly.";
         $message_type = 'error';
     } else {
-        // If an error occurred during file upload, do not proceed with product update
-        // unless you explicitly want to allow updating other fields without a successful image upload.
-        // For now, if $message_type is 'error', it means an upload issue happened, so we stop.
+       
         if ($message_type === 'error' && isset($_FILES['product_image']) && $_FILES['product_image']['error'] !== UPLOAD_ERR_NO_FILE) {
-            // An image-related error occurred, so we've already set $message and $message_type.
-            // Don't overwrite it with a generic update success/failure.
+            
         } else {
             if ($productManager->updateProduct($productId, $name, $description, $price, $categoryId, $stock, $imageUrlToSave)) {
                 $message = "Product updated successfully!";
                 $message_type = 'success';
-                // Reload product data after successful update to reflect changes
-                // This ensures $currentImageUrl in HTML part is always the latest
+                
                 $editProduct = $productManager->getProductById($productId);
                 $currentImageUrl = $editProduct['image_url'];
             } else {
@@ -146,7 +139,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 
-// Fetch only the main categories for the dropdown
 $allCategories = $categoryManager->getAllCategories();
 $main_categories_names = ['FORMAL', 'PARTYWEAR', 'BRIDAL'];
 $categoriesForDropdown = array_filter($allCategories, function($cat) use ($main_categories_names) {

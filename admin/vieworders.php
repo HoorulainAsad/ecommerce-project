@@ -12,7 +12,6 @@ if (!isLoggedIn()) {
 $orderManager = new OrderManager();
 $orders = $orderManager->getAllOrders();
 
-// No explicit unset($orderManager) needed here, destructor will handle it.
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -55,7 +54,7 @@ $orders = $orderManager->getAllOrders();
         <td data-label="Order ID"><?php echo htmlspecialchars($order['id']); ?></td>
         <td data-label="Customer Name"><?php echo htmlspecialchars($order['customer_name']); ?></td>
         <td data-label="Email"><?php echo htmlspecialchars($order['customer_email']); ?></td>
-        <td data-label="Total Amount">$<?php echo htmlspecialchars(number_format($order['total_amount'], 2)); ?></td>
+        <td data-label="Total Amount">Rs.<?php echo htmlspecialchars(number_format($order['total_amount'], 2)); ?></td>
         <td data-label="Order Date"><?php echo htmlspecialchars(date('Y-m-d H:i', strtotime($order['order_date']))); ?></td>
         <td data-label="Status">
             <form method="post" action="update_order_status.php">

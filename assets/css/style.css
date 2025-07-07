@@ -1,6 +1,3 @@
-/* assets/css/style.css */
-
-/* Import Google Font - Playfair Display */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap');
 
 /* --- Global Styles & Resets --- */
@@ -29,7 +26,6 @@ html, body {
     flex: 1;
 }
 
-
 body {
     font-family: 'Playfair Display', serif;
     background-color: #dcd8d3; 
@@ -37,7 +33,7 @@ body {
     line-height: 1.6;
     margin: 0;
     padding: 0;
-    overflow-x: hidden; /* Prevent horizontal scroll */
+    overflow-x: hidden;
     min-height: 100vh; 
     display: flex; 
     flex-direction: column; 
@@ -56,10 +52,9 @@ a {
 }
 
 a:hover {
-    color: #c2a766; /* Gold/tan from palette */
+    color: #c2a766;
 }
 
-/* Custom Utility Classes (kept as is) */
 .text-primary-custom { color: #7f0e10 !important; }
 .bg-primary-custom { background-color: #7f0e10 !important; }
 .text-secondary-custom { color: #dcd8d3 !important; }
@@ -101,14 +96,13 @@ a:hover {
 }
 
 .navbar-custom .navbar-brand img {
-    max-height: 83px; /* Adjust if logo appears small or too big */
+    max-height: 83px;
     width: auto;
     object-fit: contain;
     padding: 0 10px;
     display: block;
 }
 
-/* Navbar Links */
 .navbar-custom .nav-link {
     color: #7f0e10;
     font-weight: 500;
@@ -123,12 +117,10 @@ a:hover {
     color: #c2a766;
 }
 
-/* Search Input Fix */
 .navbar-custom .form-control {
     border-radius: 0.375rem;
 }
 
-/* Search Button */
 .navbar-custom .btn-outline-success {
     border-color: #7f0e10;
     color: #7f0e10;
@@ -139,21 +131,17 @@ a:hover {
     color: #fff;
 }
 
-
-
-
-/* Logout Button Color */
-.navbar-custom .nav-link.logout-btn { /* Assuming a class for logout or use a specific ID */
-    background-color: #7f0e10; /* Maroon color */
+.navbar-custom .nav-link.logout-btn {
+    background: #7f0e10;
     color: #ffffff;
     padding: 8px 15px;
     border-radius: 25px;
-    margin-left: 10px; /* Space from previous nav item */
+    margin-left: 10px;
     transition: background-color 0.3s ease;
 }
 
 .navbar-custom .nav-link.logout-btn:hover {
-    background-color: #a52a2a; /* Slightly darker maroon on hover */
+    background-color: #a52a2a;
     color: #ffffff;
 }
 
@@ -163,9 +151,9 @@ a:hover {
     border-radius: 25px;
     padding: 0.5rem 1rem;
     color: #2e2e2e;
-    width: 300px; /* Adjusted length of search bar, can grow with flex-grow */
-    flex-grow: 1; /* Allow search bar to grow */
-    max-width: 400px; /* Prevent it from becoming too wide */
+    width: 300px;
+    flex-grow: 1;
+    max-width: 400px;
 }
 
 .navbar-custom .btn-outline-success {
@@ -193,32 +181,24 @@ a:hover {
     font-size: 1.4rem;
 }
 
-/* Adjustments for login/signup link */
 .navbar-custom .nav-link.login-signup {
     margin-right: 0;
     white-space: nowrap;
 }
 
-/* Ensure vertical alignment of all items in the navbar */
 .navbar-collapse {
     align-items: center;
-    /* Mobile Navbar Toggle Width Fix */
-    /* By default on desktop, it should be flexible. On mobile, we will constrain it. */
 }
 
-/* --- Hero Section (Kept as is, assuming current looks are fine) --- */
 /* ========== HERO SECTION ========== */
-
-
 .hero-section {
     position: relative;
     width: 100%;
     height: 600px;
     overflow: hidden;
     background-color: #e9e3ce;
-    flex-shrink: 0; /* Add this to prevent shrinking inside flex layout */
+    flex-shrink: 0;
 }
-
 
 .hero-slide {
     width: 100%;
@@ -316,7 +296,6 @@ a:hover {
     color: #7f0e10;
     margin-bottom: 40px;
     font-weight: 700;
-    
 }
 
 .oval-categories-grid {
@@ -349,7 +328,7 @@ a:hover {
     border-radius: 50% / 60%;
     overflow: hidden;
     padding: 6px;
-    background: linear-gradient(135deg, #b38f6b, #e0c6a9, #c2a766); /* beautiful warm gradient */
+    background: linear-gradient(135deg, #b38f6b, #e0c6a9, #c2a766);
     box-sizing: border-box;
 }
 
@@ -375,8 +354,6 @@ a:hover {
     margin-top: 12px;
 }
 
-
-/* Shop All Dresses Button (End of categories section) */
 .shop-all-dresses-section {
     margin-top: 60px;
     padding-bottom: 40px;
@@ -385,8 +362,8 @@ a:hover {
 
 .shop-all-button {
     display: inline-block;
-    background-color: #c2a766; /* Gold accent color */
-    color: #2e2e2e; /* Dark text */
+    background-color: #c2a766;
+    color: #2e2e2e;
     padding: 15px 40px;
     border-radius: 30px;
     text-decoration: none;
@@ -397,18 +374,16 @@ a:hover {
 }
 
 .shop-all-button:hover {
-    background-color: #b4b0ab; /* Muted gray on hover */
+    background-color: #b4b0ab;
     transform: translateY(-5px);
     box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
-
 /* --- Product Card Styling (for category and product pages - smaller, fancy) --- */
-/* The existing .product-card and related styles are good, just enhancing them */
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Slightly smaller min-width */
-    gap: 25px; /* Space between cards */
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 25px;
     padding: 40px 20px;
     max-width: 1200px;
     margin: 0 auto;
@@ -426,7 +401,7 @@ a:hover {
     display: flex;
     flex-direction: column;
     height: 100%;
-    max-width: 100%; /* Just in case */
+    max-width: 100%;
 }
 
 .product-card:hover {
@@ -436,7 +411,7 @@ a:hover {
 
 .product-card-img-wrapper {
     width: 100%;
-    padding-top: 100%; /* 1:1 aspect ratio */
+    padding-top: 100%;
     position: relative;
     overflow: hidden;
     background-color: #f5f5f5;
@@ -508,7 +483,7 @@ a:hover {
     font-weight: 600;
     margin-top: 6px;
 }
- /* product details card */
+/* product details card */
 /* === PRODUCT DETAILS LAYOUT === */
 .product-details-container {
     display: flex;
@@ -525,8 +500,8 @@ a:hover {
 
 /* === IMAGE WRAPPER === */
 .main-image-wrapper {
-    flex: 0 0 400px; /* Fixed width */
-    height: 500px; /* Fixed height */
+    flex: 0 0 400px;
+    height: 500px;
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -648,7 +623,7 @@ a:hover {
     }
 }
 
-/* --- Shop Now Section (Kept as is) --- */
+/* --- Shop Now Section --- */
 .shop-now-section {
     background-color: #e9e3ce;
     padding: 80px 0;
@@ -677,7 +652,7 @@ a:hover {
     transform: translateY(-3px);
 }
 
-/* --- Footer Styling (Sticky Footer implemented via body flex) --- */
+/* --- Footer Styling --- */
 footer.footer-custom {
     background-color: #2e2e2e;
     color: #dcd8d3;
@@ -725,35 +700,30 @@ footer.footer-custom .footer-bottom {
     font-size: 0.85rem;
 }
 
-/* Optional: Style social icons */
 footer.footer-custom .social-icons i {
     margin-right: 8px;
     color: #c2a766;
 }
 
-
-/* General Page Padding for content below header/above footer */
-/* Removed as main element now handles content area */
-
-/* --- Checkout Page Form (Fix) --- */
+/* --- Checkout Page Form --- */
 .checkout-page-main {
     padding: 40px 20px;
-    background-color: #f2f2f2; /* Light background for the page */
-    flex-grow: 1; /* Allow this main content area to expand */
-    display: flex; /* Use flex to center container */
-    justify-content: center; /* Center horizontally */
-    align-items: flex-start; /* Align to top, not middle of viewport if form is short */
+    background-color: #f2f2f2;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 .checkout-container {
-    max-width: 700px; /* Control max width of the form container */
-    width: 100%; /* Take full width up to max-width */
-    margin: 20px auto; /* Center the container, some vertical margin */
-    background-color: #ffffff; /* White background */
-    padding: 40px; /* Ample padding inside the box */
-    border-radius: 12px; /* Rounded corners */
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15); /* Nice, elegant shadow */
-    animation: fadeIn 0.5s ease-out; /* Simple fade-in animation */
+    max-width: 700px;
+    width: 100%;
+    margin: 20px auto;
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    animation: fadeIn 0.5s ease-out;
 }
 
 @keyframes fadeIn {
@@ -769,11 +739,11 @@ footer.footer-custom .social-icons i {
 }
 
 .checkout-form h3 {
-    font-size: 1.6rem; /* Slightly smaller for sub-headings */
-    color: #7f0e10; /* Maroon for section titles */
+    font-size: 1.6rem;
+    color: #7f0e10;
     margin-top: 30px;
     margin-bottom: 15px;
-    border-bottom: 2px solid #eee; /* Subtle separator */
+    border-bottom: 2px solid #eee;
     padding-bottom: 8px;
 }
 
@@ -784,41 +754,41 @@ footer.footer-custom .social-icons i {
 .form-group label {
     display: block;
     margin-bottom: 8px;
-    font-weight: 600; /* Slightly bolder labels */
+    font-weight: 600;
     color: #555;
 }
 
 .checkout-form input[type="text"],
 .checkout-form input[type="email"],
 .checkout-form select,
-.checkout-form textarea { /* Added textarea for general form styling */
+.checkout-form textarea {
     width: 100%;
-    padding: 14px; /* More padding */
+    padding: 14px;
     border: 1px solid #ddd;
-    border-radius: 8px; /* Slightly more rounded inputs */
+    border-radius: 8px;
     font-size: 1rem;
     color: #2e2e2e;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    background-color: #fcfcfc; /* Very light background for inputs */
+    background-color: #fcfcfc;
 }
 
 .checkout-form input[type="text"]:focus,
 .checkout-form input[type="email"]:focus,
 .checkout-form select:focus,
 .checkout-form textarea:focus {
-    border-color: #c2a766; /* Gold focus border */
-    box-shadow: 0 0 0 4px rgba(194, 167, 102, 0.2); /* Subtle glow */
+    border-color: #c2a766;
+    box-shadow: 0 0 0 4px rgba(194, 167, 102, 0.2);
     outline: none;
 }
 
 .place-order-btn {
     display: block;
     width: 100%;
-    padding: 16px; /* Larger button */
-    background-color: #7f0e10; /* Maroon for primary action */
+    padding: 16px;
+    background-color: #7f0e10;
     color: #ffffff;
     border: none;
-    border-radius: 30px; /* Pill shape */
+    border-radius: 30px;
     font-size: 1.3rem;
     font-weight: 700;
     cursor: pointer;
@@ -828,279 +798,8 @@ footer.footer-custom .social-icons i {
 }
 
 .place-order-btn:hover {
-    background-color: #a52a2a; /* Darker maroon on hover */
+    background-color: #a52a2a;
     transform: translateY(-3px);
     box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
-
-/* --- Responsive Adjustments --- */
-@media (max-width: 991.98px) {
-    /* Mobile Navbar Toggle Width Fix */
-    .navbar-toggler { /* Assuming you have a standard Bootstrap-like toggler */
-        display: block; /* Show toggler on smaller screens */
-        border: none;
-        background-color: transparent;
-        font-size: 1.5rem;
-        cursor: pointer;
-        color: #7f0e10; /* Match text color */
-    }
-
-    .navbar-collapse {
-        background-color: #e9e3ce; /* Light beige background for mobile menu */
-        padding: 15px;
-        border-radius: 8px;
-        margin-top: 10px;
-        position: absolute; /* Position relative to navbar */
-        width: calc(100% - 40px); /* Adjust width to prevent horizontal scroll, accounting for page padding */
-        left: 20px; /* Align with page padding */
-        right: 20px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        z-index: 1000; /* Ensure it's above other content */
-        overflow-x: hidden; /* Prevent horizontal scroll within the menu */
-        /* Use max-height for toggle effect (controlled by JS adding 'show' class) */
-        max-height: 0;
-        overflow-y: hidden;
-        transition: max-height 0.4s ease-out, padding 0.4s ease-out; /* Smooth transition */
-        flex-direction: column; /* Stack nav items vertically */
-    }
-
-    .navbar-collapse.show {
-        max-height: 500px; /* Or a value large enough to fit all content */
-        padding: 15px; /* Reapply padding when shown */
-    }
-
-    .navbar-custom .nav-link {
-        margin-right: 0;
-        text-align: center;
-        padding: 10px 0; /* Add vertical padding for mobile links */
-        border-bottom: 1px solid #f0e9d6; /* Subtle separator */
-    }
-    .navbar-custom .nav-link:last-child {
-        border-bottom: none; /* No border on last item */
-    }
-
-    .navbar-custom .form-inline {
-        justify-content: center;
-        margin-top: 15px;
-        width: 100%; /* Make search bar take full width */
-    }
-    .navbar-custom .form-control {
-        width: 80%; /* Adjusted width for mobile search */
-        max-width: 300px;
-    }
-    .navbar-custom .btn-outline-success {
-        margin-left: 0;
-        margin-top: 10px; /* Push button below search input */
-    }
-
-    .navbar-custom .user-greeting,
-    .navbar-custom .cart-icon {
-        display: block;
-        text-align: center;
-        margin-top: 15px;
-        margin-left: 0;
-    }
-
-    .hero-section {
-        height: 450px;
-    }
-    .hero-overlay h1 {
-        font-size: 3rem;
-    }
-    .hero-overlay p {
-        font-size: 1.2rem;
-    }
-
-    /* Category Oval Cards */
-    .category-oval-card {
-        flex: 0 0 calc(50% - 20px); /* 2 items per row on medium screens */
-    }
-
-   
-    .zigzag-item {
-        flex-direction: column !important; 
-        text-align: center;
-    }
-    .zigzag-item img, .zigzag-text {
-        width: 100%;
-        height: auto; /* Allow height to adjust */
-    }
-    .zigzag-text {
-        padding: 25px; 
-    }
-    .zigzag-text h3 {
-        font-size: 1.6rem;
-    }
-    .zigzag-text p {
-        font-size: 1rem;
-    }
-
-    /* Product Details Page */
-    .product-details-container {
-        flex-direction: column; /* Stack image and info */
-        padding: 25px;
-        margin: 20px auto;
-    }
-    .product-image-gallery,
-    .product-info-details {
-        flex: 1 1 100%; /* Take full width */
-    }
-    .product-info-details h1 {
-        font-size: 2.5rem;
-    }
-    .product-info-details .price {
-        font-size: 1.8rem;
-    }
-
-    /* Checkout Page */
-    .checkout-container {
-        padding: 25px;
-        margin: 15px auto;
-    }
-    .checkout-container h2 {
-        font-size: 2rem;
-    }
-    .checkout-form h3 {
-        font-size: 1.4rem;
-    }
-    .place-order-btn {
-        padding: 12px;
-        font-size: 1.1rem;
-    }
-}
-
-@media (max-width: 767.98px) {
-    .navbar-custom {
-        min-height: 80px; /* Smaller navbar height on very small screens */
-    }
-    .navbar-custom .navbar-brand {
-        height: 60px;
-    }
-    .navbar-custom .navbar-brand img {
-        height: 100%; /* Adjust image to new brand height */
-    }
-
-    .hero-section {
-        height: 350px;
-    }
-    .hero-overlay h1 {
-        font-size: 2.5rem;
-    }
-    .hero-overlay p {
-        font-size: 1rem;
-    }
-    .hero-button {
-        padding: 10px 25px;
-        font-size: 1rem;
-    }
-
-    .category-section, .shop-now-section {
-        padding: 40px 15px;
-    }
-    .category-section h2, .shop-now-section h2 {
-        font-size: 2rem;
-    }
-    .product-card-img-wrapper {
-        padding-top: 75%; /* More rectangular image for smaller cards */
-    }
-    .product-card-body h4 {
-        font-size: 1.1rem;
-    }
-    .product-card-body .price {
-        font-size: 1.15rem;
-    }
-
-    /* Footer */
-    .site-footer .container-fluid {
-        flex-direction: column; /* Stack columns vertically */
-        align-items: center;
-    }
-    .footer-column {
-        text-align: center;
-        margin-bottom: 20px;
-    }
-}
-
-@media (max-width: 575.98px) {
-    .navbar-custom .navbar-brand {
-        font-size: 1.5rem;
-    }
-    .hero-section {
-        height: 300px;
-    }
-    .hero-overlay h1 {
-        font-size: 2rem;
-    }
-    .hero-overlay p {
-        font-size: 0.9rem;
-    }
-    .hero-button {
-        padding: 8px 20px;
-        font-size: 0.9rem;
-    }
-
-    /* Category Oval Cards */
-    .category-oval-card {
-        flex: 0 0 calc(100% - 20px); /* 1 item per row on very small screens */
-    }
-    .category-oval-image-wrapper {
-        width: 120px;
-        height: 120px;
-    }
-    .category-oval-name {
-        font-size: 1rem;
-    }
-
-    /* Product Cards */
-    .product-grid {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Even smaller min-width */
-        gap: 15px;
-    }
-    .product-card-img-wrapper {
-        padding-top: 100%; /* Back to square if preferred for small screens */
-    }
-    .product-card-body {
-        padding: 10px;
-    }
-
-    /* Product Details Page */
-    .main-image-wrapper {
-        padding-top: 100%; /* Square image on mobile */
-    }
-    .thumbnail {
-        width: 60px;
-        height: 60px;
-    }
-    .product-info-details h1 {
-        font-size: 2rem;
-    }
-    .product-info-details .price {
-        font-size: 1.5rem;
-    }
-    .product-info-details .description {
-        font-size: 0.95rem;
-    }
-    .product-info-details .btn-add-to-cart {
-        padding: 12px 20px;
-        font-size: 1rem;
-    }
-}
-
-.product-card-img-wrapper {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    position: relative;
-    overflow: hidden;
-    background-color: #f5f5f5;
-    display: block;
-}
-
-.product-card-img-wrapper img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}

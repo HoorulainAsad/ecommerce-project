@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/classes/CartManager.php';
-require_once __DIR__ . '/includes/functions.php'; // Assuming this has redirectTo and displayMessage
+require_once __DIR__ . '/includes/functions.php'; 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cartManager = new CartManager();
@@ -14,8 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $success = $cartManager->updateQuantity($cartId, $action);
         } elseif ($action === 'delete') {
             $success = $cartManager->deleteItem($cartId);
-        } elseif ($action === 'update_checked_status') { // NEW ACTION
-            $isChecked = isset($_POST['is_checked']) && $_POST['is_checked'] === 'true'; // Get boolean from JS
+        } elseif ($action === 'update_checked_status') { 
+            $isChecked = isset($_POST['is_checked']) && $_POST['is_checked'] === 'true'; 
             $success = $cartManager->updateItemCheckedStatus($cartId, $isChecked);
         }
 
@@ -27,7 +27,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'grand_total' => (float)$cartManager->getCheckedCartTotal()
                 ]);
                 exit;
-// Stop script execution after sending JSON
         }
 
         // For non-AJAX requests (like the existing quantity forms)

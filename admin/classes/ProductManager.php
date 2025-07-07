@@ -10,12 +10,7 @@ class ProductManager {
         $this->conn = getDbConnection();
     }
 
-    // IMPORTANT: Ensure this __destruct() method is ABSENT or commented out if it tries to close the connection.
-    /*
-    public function __destruct() {
-        // Do NOT close the connection here. It's managed globally.
-    }
-    */
+  
 
     /**
      * Adds a new product to the database.
@@ -40,10 +35,7 @@ class ProductManager {
         return $result;
     }
 
-    /**
-     * Retrieves all products from the database.
-     * @return array An array of product associative arrays.
-     */
+    
     public function getAllProducts() {
         $sql = "SELECT p.*, c.name AS category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id ORDER BY p.name ASC";
         $result = $this->conn->query($sql);
@@ -56,11 +48,6 @@ class ProductManager {
         return $products;
     }
 
-    /**
-     * Retrieves a product by its ID.
-     * @param int $productId
-     * @return array|null An associative array of product data, or null if not found.
-     */
     public function getProductById($productId) {
         $sql = "SELECT p.*, c.name AS category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = ?";
         $stmt = $this->conn->prepare($sql);
@@ -92,7 +79,7 @@ class ProductManager {
         $types = "ssdii";
         $params = [$name, $description, $price, $categoryId, $stock];
 
-        if ($imageUrl !== null) { // Only update image_url if a new one is provided
+        if ($imageUrl !== null) { 
             $sql .= ", image_url = ?";
             $types .= "s";
             $params[] = $imageUrl;
@@ -107,7 +94,7 @@ class ProductManager {
             error_log("ProductManager::updateProduct - Prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
             return false;
         }
-        // Use call_user_func_array for bind_param with dynamic parameters
+        
         $bind_names = array($types);
         for ($i = 0; $i < count($params); $i++) {
             $bind_name = 'bind' . $i;
@@ -127,16 +114,16 @@ class ProductManager {
      * @return bool True on success, false on failure.
      */
     public function deleteProduct($productId) {
-        // Optional: Get product details to delete image file from server
+       
         $product = $this->getProductById($productId);
         if ($product && !empty($product['image_url'])) {
-            // Construct the absolute path to the image file
+           
             $imagePath = realpath(__DIR__ . '/../' . $product['image_url']);
 
             if ($imagePath && file_exists($imagePath) && is_file($imagePath)) {
-                // Ensure the path is within the allowed uploads directory as a security measure
+                
                 if (strpos($imagePath, realpath(__DIR__ . '/../uploads/products/')) === 0) {
-                    unlink($imagePath); // Delete the actual file
+                    unlink($imagePath); 
                 } else {
                     error_log("ProductManager::deleteProduct - Attempt to delete file outside of uploads directory: " . $imagePath);
                 }
@@ -194,15 +181,12 @@ class ProductManager {
         $result = $this->conn->query($sql);
         if ($result) {
             $row = $result->fetch_assoc();
-            return (int)$row['count']; // Cast to int for safety
+            return (int)$row['count']; 
         }
         return 0;
     }
 
-    /**
-     * Retrieves new arrival products (products added in the last 30 days).
-     * @return array An array of product associative arrays.
-     */
+    
     public function getNewArrivalProducts() {
         $sql = "SELECT p.*, c.name AS category_name
                 FROM products p
@@ -248,12 +232,7 @@ class ProductManager {
         return $products;
     }
 
-    /**
-     * Decrements the stock of a product by a given quantity.
-     * @param int $productId
-     * @param int $quantity The amount to decrement the stock by.
-     * @return bool True on success, false on failure.
-     */
+    
     public function updateProductStock($productId, $quantity) {
         $sql = "UPDATE products SET stock = stock - ? WHERE id = ? AND stock >= ?";
         $stmt = $this->conn->prepare($sql);
@@ -261,9 +240,7 @@ class ProductManager {
             error_log("ProductManager::updateProductStock - Prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
             return false;
         }
-        // Ensure stock doesn't go below zero (optional, but good practice)
-        // By checking stock >= quantity, we prevent negative stock.
-        // If you want to allow negative stock, remove the 'AND stock >= ?' and the third bind_param.
+        
         $stmt->bind_param("iii", $quantity, $productId, $quantity);
         $result = $stmt->execute();
 

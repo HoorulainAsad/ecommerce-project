@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = "Database error: " . $conn->error;
             $error = true;
         }
-        // No need to close connection here - shutdown function will handle it
+       
     }
 }
 ?>

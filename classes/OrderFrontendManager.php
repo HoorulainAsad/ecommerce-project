@@ -1,7 +1,6 @@
 <?php
 // classes/OrderFrontendManager.php
 
-// In C:\xampp\htdocs\msgm_clothing\classes\CartManager.php
 require_once __DIR__ . '/../admin/includes/database.php';
 
 class OrderFrontendManager {
@@ -19,7 +18,6 @@ class OrderFrontendManager {
         return $stmt->insert_id;
     }
 
-    // ✅ No size column here
     public function insertOrderItem($orderId, $productId, $name, $quantity, $price) {
     $stmt = $this->conn->prepare("INSERT INTO order_items (order_id, product_id, name, quantity, price)
                                   VALUES (?, ?, ?, ?, ?)");

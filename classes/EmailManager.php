@@ -1,8 +1,7 @@
 <?php
 // classes/EmailManager.php
 
-// ⚠️ IMPORTANT: Adjust these paths if you are not using Composer
-// If you downloaded PHPMailer manually, make sure these paths correctly point to your PHPMailer installation.
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\SMTP;
@@ -11,19 +10,12 @@ require_once __DIR__ . '/../libs/PHPMailer/src/Exception.php';
 require_once __DIR__ . '/../libs/PHPMailer/src/PHPMailer.php';
 require_once __DIR__ . '/../libs/PHPMailer/src/SMTP.php';
 
-// IMPORTANT: Ensure your admin/includes/config.php is accessible and defines WEB_ROOT_URL.
-// This is crucial for correctly forming links in emails (e.g., review links).
+
 require_once __DIR__ . '/../admin/includes/config.php';
 
 class EmailManager {
 
-    // --- Private Helper Methods for Email Structure Consistency ---
-
-    /**
-     * Generates the common HTML header for all emails.
-     * @param string $subject The subject of the email for the <title> tag.
-     * @return string HTML string for the email header.
-     */
+    
     private function getCommonEmailHeader($subject) {
         return "
         <html>
@@ -51,10 +43,7 @@ class EmailManager {
                 <div class='content'>"; // Closes with '</div>' in getCommonEmailFooter()
     }
 
-    /**
-     * Generates the common HTML footer for all emails.
-     * @return string HTML string for the email footer.
-     */
+   
     private function getCommonEmailFooter() {
         return "
                 </div><!-- .content -->
@@ -80,33 +69,27 @@ class EmailManager {
         $mail = new PHPMailer(true); // Enable exceptions for better error handling
 
         try {
-            // Server settings (🚨 REPLACE WITH YOUR ACTUAL SMTP CREDENTIALS 🚨)
+          
             $mail->isSMTP();
             $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
             $mail->Username   = 'hoorulainasad583@gmail.com';
-            $mail->Password   = 'aoscxvtbcnibfotm'; // Use an App Password for Gmail
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // or PHPMailer::ENCRYPTION_SMTPS for SSL on 465
+            $mail->Password   = 'aoscxvtbcnibfotm'; 
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; 
             $mail->Port       = 587; // or 465 for SSL
 
-            // Optional: For debugging purposes. Set to 0 in production.
-            // $mail->SMTPDebug = SMTP::DEBUG_SERVER; // Shows SMTP interaction (useful for debugging)
-
-            // Recipients
-            // 🚨 IMPORTANT: 'From' email should often be a verified sender in your SMTP service 🚨
             $mail->setFrom('hoorulainasad583@gmail.com', 'MSGM Bridal'); // Your store's email address and name
-            $mail->addAddress($recipientEmail); // Add the recipient's email address
+            $mail->addAddress($recipientEmail); 
 
             // Content
-            $mail->isHTML(true); // Set email format to HTML
+            $mail->isHTML(true); 
             $mail->Subject = $subject;
             $mail->Body    = $body;
-            $mail->AltBody = strip_tags($body); // Plain-text alternative
+            $mail->AltBody = strip_tags($body);
 
             $mail->send();
             return true; // Email sent successfully
         } catch (Exception $e) {
-            // Log the error for debugging purposes (e.g., to a file or error tracking service)
             error_log("Message could not be sent to {$recipientEmail}. Mailer Error: {$mail->ErrorInfo}");
             return false;
         }
@@ -114,20 +97,9 @@ class EmailManager {
 
     // --- Public Email Sending Methods ---
 
-    /**
-     * Sends an order confirmation email to the customer.
-     *
-     * @param string $recipientEmail The customer's email address.
-     * @param array $orderDetails An associative array containing full order details.
-     * Expected keys: 'id', 'customer_name', 'order_status', 'created_at', 'payment_method',
-     * 'total_amount', 'shipping_address', 'city', 'postal_code', 'customer_phone' (optional),
-     * and 'items' (array of product details with 'name', 'quantity', 'price').
-     * @return bool True on success, false on failure.
-     */
     public function sendOrderConfirmationEmail($recipientEmail, $orderDetails) {
         $subject = "Order Confirmation - MSGM Bridal #" . htmlspecialchars($orderDetails['id']);
 
-        // Start building the email body using common header
         $messageBody = $this->getCommonEmailHeader($subject);
 
         // Specific content for order confirmation
@@ -201,14 +173,7 @@ class EmailManager {
         return $this->sendEmailWithPHPMailer($recipientEmail, $subject, $messageBody);
     }
 
-    /**
-     * Sends an order status update email to the customer.
-     *
-     * @param string $recipientEmail The customer's email address.
-     * @param array $orderDetails An associative array containing full order details.
-     * Expected keys: 'id', 'customer_name', 'order_status', 'items' (array of product details with 'product_id', 'name', 'price').
-     * @return bool True on success, false on failure.
-     */
+    
     public function sendOrderStatusUpdateEmail($recipientEmail, $orderDetails) {
         // Ensure $orderDetails is an array and has necessary keys to prevent errors
         if (!is_array($orderDetails) || !isset($orderDetails['id'], $orderDetails['order_status'])) {
@@ -218,10 +183,8 @@ class EmailManager {
 
         $subject = "Order Status Updated - MSGM Bridal #" . htmlspecialchars($orderDetails['id']);
 
-        // Start building the email body using common header
         $messageBody = $this->getCommonEmailHeader($subject);
 
-        // Specific content for order status update
         $messageBody .= "
             <p>Dear " . htmlspecialchars($orderDetails['customer_name'] ?? 'Customer') . ",</p>
             <p>Your order #<strong>" . htmlspecialchars($orderDetails['id']) . "</strong> status has been updated to: <span style='color:#7f0e10; font-weight: bold;'>" . htmlspecialchars(ucfirst($orderDetails['order_status'])) . "</span></p>
@@ -243,16 +206,14 @@ class EmailManager {
                 </thead>
                 <tbody>";
 
-            // Loop through order items to generate review link for each
-            // Ensure 'items' key exists and is an array before looping
+            
             if (isset($orderDetails['items']) && is_array($orderDetails['items']) && !empty($orderDetails['items'])) {
                 foreach ($orderDetails['items'] as $item) {
                     $productId = htmlspecialchars($item['product_id'] ?? '');
                     $productName = htmlspecialchars($item['name'] ?? 'N/A');
                     $price = number_format($item['price'] ?? 0, 2);
 
-                    // Construct the review link for EACH product
-                    // Make sure WEB_ROOT_URL is defined (e.g., from admin/includes/config.php)
+                    
                     global $WEB_ROOT_URL; // Access the global WEB_ROOT_URL constant
                     $reviewLink = ($WEB_ROOT_URL ?? 'http://192.168.100.14/msgm_clothing/') . "review_submission.php?order_id=" . htmlspecialchars($orderDetails['id']) . "&product_id={$productId}";
 
@@ -277,7 +238,6 @@ class EmailManager {
             </table>";
         }
 
-        // End building the email body with common footer
         $messageBody .= $this->getCommonEmailFooter();
 
         // Call the private PHPMailer sending function
@@ -300,7 +260,6 @@ class EmailManager {
 
         $subject = "Order Cancellation - MSGM Bridal #" . htmlspecialchars($orderDetails['id']);
 
-        // Start building the email body using common header
         $messageBody = $this->getCommonEmailHeader($subject);
 
         $messageBody .= "
@@ -309,7 +268,6 @@ class EmailManager {
             <p><strong>Reason for Cancellation:</strong> " . htmlspecialchars($orderDetails['reason']) . "</p>
             <p>If you have any questions or would like to re-place your order, please contact us.</p>";
 
-        // End building the email body with common footer
         $messageBody .= $this->getCommonEmailFooter();
 
         return $this->sendEmailWithPHPMailer($recipientEmail, $subject, $messageBody);

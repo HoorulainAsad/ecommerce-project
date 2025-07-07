@@ -19,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Optional: Save additional details or proceed with order
 }
 
 if (empty($cartItems)) {
@@ -29,7 +28,6 @@ if (empty($cartItems)) {
 }
 ?>
 
-<!-- ✅ Styled Checkout Layout -->
 <div class="checkout-page-main">
     <div class="checkout-container">
         <h2>Checkout</h2>

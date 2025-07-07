@@ -25,6 +25,9 @@ $totalUsers = $userManager->getTotalUsersCount();
 $newArrivalsCount = $productManager->getNewArrivalsCount();
 $trendyCollectionCount = $orderManager->getTrendyProductsCount();
 $pendingReviews = $reviewManager->getReviewCountByStatus('Pending');
+$reviewManager = new ReviewManager();
+$allReviews = $reviewManager->getAllReviews();
+$totalReviews = count($allReviews);
 
 ?>
 <!DOCTYPE html>
@@ -109,9 +112,9 @@ $pendingReviews = $reviewManager->getReviewCountByStatus('Pending');
                     <div class="value"><?php echo $trendyCollectionCount; ?></div>
                     <div class="label">Trendy Products (Ordered)</div>
                 </a>
-                <a href="<?php echo BASE_URL; ?>admin/customerfeedback.php?filter=pending" class="stat-card-link">
+                <a href="<?php echo BASE_URL; ?>admin/customerfeedback.php" class="stat-card-link">
                     <i class="fas fa-comments icon"></i>
-                    <div class="value"><?php echo $pendingReviews; ?></div>
+                    <div class="value"><?php echo $totalReviews; ?></div>
                     <div class="label">Reviews</div>
                 </a>
             </div>

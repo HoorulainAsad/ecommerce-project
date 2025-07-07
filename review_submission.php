@@ -1,14 +1,12 @@
 <?php
 // review_submission.php (in MSGM_CLOTHING root)
 
-// Ensure common functions and configuration are loaded
 require_once __DIR__ . '/admin/includes/database.php';
 require_once __DIR__ . '/admin/classes/ReviewManager.php';
-require_once __DIR__ . '/classes/ProductFrontendManager.php'; // To get product details
-require_once __DIR__ . '/admin/includes/config.php'; // For WEB_ROOT_URL
-require_once __DIR__ . '/includes/functions.php'; // For sanitizeInput, displayMessage (if you have it)
+require_once __DIR__ . '/classes/ProductFrontendManager.php'; 
+require_once __DIR__ . '/admin/includes/config.php'; 
+require_once __DIR__ . '/includes/functions.php'; 
 
-// Initialize messages
 $message = '';
 $message_type = ''; // 'success' or 'error'
 
@@ -16,12 +14,10 @@ $message_type = ''; // 'success' or 'error'
 $orderId = isset($_GET['order_id']) ? filter_var($_GET['order_id'], FILTER_VALIDATE_INT) : null;
 $productId = isset($_GET['product_id']) ? filter_var($_GET['product_id'], FILTER_VALIDATE_INT) : null;
 
-// Determine if the request is valid for showing the form
 $validRequestForForm = ($orderId !== false && $orderId !== null && $productId !== false && $productId !== null);
 
 // --- Handle Form Submission (POST Request) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $validRequestForForm) {
-    // Re-validate IDs from POST as hidden fields could be manipulated
     $postOrderId = filter_var($_POST['order_id'] ?? null, FILTER_VALIDATE_INT);
     $postProductId = filter_var($_POST['product_id'] ?? null, FILTER_VALIDATE_INT);
 
@@ -40,10 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $validRequestForForm) {
             // Assuming addReview needs customer_id, it's null here. If you have user sessions, pass actual ID.
             if ($reviewManager->addReview($orderId, $customerName, $rating, $comment, $customerEmail, null, $productId)) {
                 $message = "Thank you for your review! It has been submitted for approval.";
-                $message_type = 'success';
-                // Optionally clear the form fields by redirecting or resetting variables
-                // header("Location: review_submission.php?order_id=$orderId&product_id=$productId&msg=" . urlencode($message) . "&type=success");
-                // exit();
+                
             } else {
                 $message = "Error submitting your review. Please try again later.";
                 $message_type = 'error';
@@ -52,13 +45,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $validRequestForForm) {
     } else {
         $message = "Security error: Mismatched order/product IDs.";
         $message_type = 'error';
-        $validRequestForForm = false; // Invalidate the request to prevent form display
+        $validRequestForForm = false; 
     }
 }
 
 // --- Fetch Product Name for Display (if valid GET request) ---
 $productName = '';
-if ($validRequestForForm) { // Only try to fetch product name if IDs are valid
+if ($validRequestForForm) { 
     $productManager = new ProductFrontendManager();
     $product = $productManager->getProductById($productId);
     if ($product) {
@@ -66,11 +59,10 @@ if ($validRequestForForm) { // Only try to fetch product name if IDs are valid
     } else {
         $message = "Product not found for the given ID. Invalid review link.";
         $message_type = 'error';
-        $validRequestForForm = false; // Invalidate the request if product not found
+        $validRequestForForm = false; 
     }
 } else {
-    // This message is for the initial load if IDs are missing/invalid
-    if (empty($message)) { // Don't override message from POST errors
+    if (empty($message)) { 
         $message = "Invalid review link. Missing or invalid order ID or product ID.";
         $message_type = 'error';
     }

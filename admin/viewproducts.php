@@ -18,20 +18,12 @@ $orderManager = new OrderManager();
 $message = '';
 $message_type = ''; // success or error
 
-// Define the directory where uploaded product images are stored
 $uploadDir = __DIR__ . '/uploads/products/';
 
-// --- Handle Edit Product Form Submission ---
-// This logic was moved from manageproducts.php, but it will be slightly different now.
-// For simplicity, I'm assuming 'edit' action takes you to a separate 'editproduct.php'
-// or you'll handle it via a modal here. For now, let's keep it simple:
-// if you click edit, it will take you to a pre-filled Add Product page.
-// In a full system, you might have an editproduct.php similar to addproduct.php but with update logic.
 
-// --- Handle Delete Product ---
+
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
     $productIdToDelete = (int)$_GET['id'];
-    // Optional: Delete the actual image file from the server when product is deleted
     $productToDelete = $productManager->getProductById($productIdToDelete);
     if ($productToDelete && !empty($productToDelete['image_url'])) {
         $filePath = __DIR__ . '/' . $productToDelete['image_url']; // Construct full path
@@ -47,11 +39,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
         $message = "Error deleting product.";
         $message_type = 'error';
     }
-    // Redirect to clear GET parameters after deletion
     redirectToAdmin('viewproducts.php?msg=' . urlencode($message) . '&type=' . $message_type);
 }
 
-// Check for messages from redirects (e.g., after deletion or add product)
 if (isset($_GET['msg']) && isset($_GET['type'])) {
     $message = sanitizeInput($_GET['msg']);
     $message_type = sanitizeInput($_GET['type']);
@@ -70,14 +60,7 @@ if ($filter === 'new_arrivals') {
 } else {
     $products = $productManager->getAllProducts(); // Get all products by default
 }
-// --- End Filtering Products ---
 
-// Fetch only the main categories for the dropdown (not needed here anymore for product management form)
-// $allCategories = $categoryManager->getAllCategories();
-// $main_categories_names = ['FORMAL', 'PARTYWEAR', 'BRIDAL'];
-// $categoriesForDropdown = array_filter($allCategories, function($cat) use ($main_categories_names) {
-//     return in_array(strtoupper($cat['name']), $main_categories_names);
-// });
 
 ?>
 <!DOCTYPE html>
@@ -102,7 +85,7 @@ if ($filter === 'new_arrivals') {
                 <?php displayMessage($message, $message_type); ?>
             <?php endif; ?>
 
-            <?php if ($filter): // Show filter info if filter is active ?>
+            <?php if ($filter):  ?>
                 <div class="filter-header">
                     <i class="fas fa-filter"></i> Displaying: <?php echo htmlspecialchars($pageTitle); ?>
                     <a href="<?php echo BASE_URL; ?>admin/viewproducts.php" style="margin-left: 15px;">Clear Filter</a>
@@ -147,11 +130,10 @@ if ($filter === 'new_arrivals') {
                                 </td>
                                 <td data-label="Name"><?php echo htmlspecialchars($product['name']); ?></td>
                                 <td data-label="Category"><?php echo htmlspecialchars($product['category_name'] ?? 'N/A'); ?></td>
-                                <td data-label="Price">$<?php echo htmlspecialchars(number_format($product['price'], 2)); ?></td>
+                                <td data-label="Price">Rs.<?php echo htmlspecialchars(number_format($product['price'], 2)); ?></td>
                                 <td data-label="Stock Status">
                                 <?php
-                                // Use the null coalescing operator to safely access 'stock', defaulting to 0 if not set.
-                                // This prevents the "Undefined array key" warning.
+                                
                                 $current_stock = $product['stock'] ?? 0;
 
                                 if ($current_stock <= 0):

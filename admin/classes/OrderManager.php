@@ -1,23 +1,20 @@
 <?php
 // admin/classes/OrderManager.php
 
-require_once __DIR__ . '/../includes/database.php'; // Correct path to your database connection function
-
+require_once __DIR__ . '/../includes/database.php'; 
 class OrderManager {
     private $conn;
     private $userReferenceColumn;
 
     public function __construct() {
-        $this->conn = getDbConnection(); // Assumes getDbConnection() returns a valid mysqli connection
+        $this->conn = getDbConnection(); 
         if (!$this->conn) {
             throw new Exception("OrderManager: Could not establish database connection.");
         }
         $this->determineUserReferenceColumn();
     }
 
-    /**
-     * Determines the correct column name that references users in orders table
-     */
+    
     private function determineUserReferenceColumn() {
         $possibleColumns = ['user_id', 'customer_id', 'client_id', 'buyer_id'];
 
@@ -33,10 +30,7 @@ class OrderManager {
         error_log("OrderManager: Could not determine user reference column in orders table");
     }
 
-    /**
-     * Retrieves all orders from the database.
-     * @return array An array of order associative arrays.
-     */
+    
     public function getAllOrders() {
        $sql = "SELECT id, customer_name, customer_email, total_amount, order_date, order_status
          FROM orders
@@ -56,10 +50,7 @@ class OrderManager {
         return $orders;
     }
 
-    /**
-     * Gets the count of all orders.
-     * @return int The total number of orders.
-     */
+    
     public function getTotalOrdersCount() {
         $sql = "SELECT COUNT(id) AS total_orders FROM orders";
         $result = $this->conn->query($sql);
@@ -114,9 +105,9 @@ class OrderManager {
             while ($row = $result->fetch_assoc()) {
                 $items[] = [
                     'product_id' => $row['product_id'],
-                    'name' => $row['product_name'], // Renamed for consistency with email template
+                    'name' => $row['product_name'], 
                     'quantity' => $row['quantity'],
-                    'price' => $row['price_at_purchase'] ?? $row['unit_price'], // Use price_at_purchase if exists
+                    'price' => $row['price_at_purchase'] ?? $row['unit_price'], 
                 ];
             }
         }
@@ -177,10 +168,7 @@ class OrderManager {
     public function getOrderDetailsForEmail($orderId) {
         $orderDetails = null;
 
-        // Fetch main order details
-        // Removed 'o.customer_phone' from SELECT statement as it caused "Unknown column" error.
-        // If you have a customer phone column with a different name (e.g., 'contact_number'),
-        // replace 'o.customer_phone' with 'o.contact_number' here.
+       
         $stmt = $this->conn->prepare("SELECT o.id, o.customer_name, o.customer_email, o.order_status,
                                               o.created_at, o.payment_method, o.total_amount,
                                               o.shipping_address, o.city, o.postal_code,
@@ -199,8 +187,8 @@ class OrderManager {
         $stmt->close();
 
         if ($orderDetails) {
-            // Now fetch the order items (products) for this order
-            $items = $this->getOrderItems($orderId); // Re-use existing getOrderItems method
+          
+            $items = $this->getOrderItems($orderId); 
             $orderDetails['items'] = $items;
         }
 

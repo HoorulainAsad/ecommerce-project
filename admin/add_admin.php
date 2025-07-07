@@ -1,12 +1,12 @@
 <?php
 // admin/add_admin.php
 
-require_once __DIR__ . '/includes/functions.php'; // Includes config and starts session
+require_once __DIR__ . '/includes/functions.php'; 
 require_once __DIR__ . '/includes/database.php'; // Include for database connection
 
 // Check if admin is logged in AND has 'super_admin' role
 if (!isLoggedIn() || !isSuperAdmin()) {
-    redirectToAdmin('login.php'); // Redirect to login if not authorized
+    redirectToAdmin('login.php'); 
 }
 
 $message = '';
@@ -16,8 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = sanitizeInput($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
-    $email = sanitizeInput($_POST['email'] ?? ''); // Assuming you want email for new admins
-    $role = sanitizeInput($_POST['role'] ?? 'admin'); // Default role to 'admin'
+    $email = sanitizeInput($_POST['email'] ?? ''); 
+    $role = sanitizeInput($_POST['role'] ?? 'admin'); 
 
     if (empty($username) || empty($password) || empty($confirm_password) || empty($email)) {
         $message = "All fields are required.";
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($stmt_insert->execute()) {
                     $message = "New admin '$username' added successfully!";
                     $error = false;
-                    // Clear form fields after successful submission
+                   
                     $_POST = array();
                 } else {
                     $message = "Error adding admin: " . $stmt_insert->error;
@@ -75,10 +75,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add New Admin - MSGM Bridal Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Anonymous+Pro:ital,wght@0,400;0,700;1,400;1,700&family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
-    <!-- Link to your external stylesheet -->
+    
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>admin/assets/css/styles.css?v=3">
     <style>
-        /* Basic styling for the form, you can integrate this into your styles.css */
+       
         body {
            font-family: "Lora" , monospace;
             background-color: #e9e3ce;
@@ -86,9 +86,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 0;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Align to top for better form visibility */
+            align-items: flex-start; 
             min-height: 100vh;
-            padding-top: 50px; /* Add some padding from the top */
+            padding-top: 50px; 
         }
         .container {
             background-color: #fff;
@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 500px;
-            margin-bottom: 50px; /* Space at the bottom */
+            margin-bottom: 50px;
         }
         h2 {
             text-align: center;
@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 5px;
-            box-sizing: border-box; /* Include padding in width */
+            box-sizing: border-box; 
             font-size: 1rem;
         }
         input[type="text"]:focus,
@@ -134,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
         }
         .add-admin-button {
-            background-color: #28a745; /* Green for add action */
+            background-color: #28a745; 
             color: white;
             padding: 12px 20px;
             border: none;

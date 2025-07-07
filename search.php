@@ -6,61 +6,54 @@ require_once __DIR__ . '/classes/ProductFrontendManager.php';
 
 $productManager = new ProductFrontendManager();
 
-// Sanitize the search query from GET request
 $searchQuery = sanitizeInput($_GET['q'] ?? '');
 $products = [];
 $pageTitle = "Search Results for '" . htmlspecialchars($searchQuery) . "'";
 
 if (!empty($searchQuery)) {
-    // Get database connection. The getDbConnection() function should ideally handle
-    // connection persistence and reconnection (e.g., using mysqli_ping()).
+    
     $db = getDbConnection();
 
     // Check if the connection was successfully established.
     if (!$db) {
         displayMessage("Could not connect to the database. Please try again later.", "error");
     } else {
-        // Prepare the SQL query to search for products by name or description.
-        // Using LIKE for partial matches.
+       
         $sql = "SELECT p.id, p.name, p.description, p.price, p.stock, p.image_url, c.name AS category_name
                 FROM products p
                 LEFT JOIN categories c ON p.category_id = c.id
                 WHERE p.name LIKE ? OR p.description LIKE ?
                 ORDER BY p.name ASC";
 
-        $stmt = $db->prepare($sql); // Prepare the SQL statement
+        $stmt = $db->prepare($sql); 
 
         if ($stmt) {
             $searchTerm = '%' . $searchQuery . '%';
-            // Bind parameters to the prepared statement. "ss" means two string parameters.
             $stmt->bind_param("ss", $searchTerm, $searchTerm);
 
-            // Execute the prepared statement. This is where the original error occurred.
-            // If getDbConnection() implements mysqli_ping(), it should help prevent "server gone away"
-            // errors by attempting to reconnect if the connection has died.
+            
             if ($stmt->execute()) {
-                $result = $stmt->get_result(); // Get the result set
+                $result = $stmt->get_result(); 
                 // Fetch all matching products
                 while ($row = $result->fetch_assoc()) {
-                    $row['is_out_of_stock'] = ($row['stock'] <= 0); // Determine stock status
+                    $row['is_out_of_stock'] = ($row['stock'] <= 0); 
                     $products[] = $row;
                 }
-                $result->free(); // Free the result set
+                $result->free(); 
             } else {
                 // Log and display error if statement execution fails
                 error_log("Search query execution failed: " . $stmt->error);
                 displayMessage("A database error occurred during your search. Please try again.", "error");
             }
-            $stmt->close(); // Close the statement
+            $stmt->close(); 
         } else {
-            // Log and display error if statement preparation fails
             error_log("Search query preparation failed: " . $db->error);
             displayMessage("Failed to prepare search query. Please try again later.", "error");
         }
     }
 } else {
     $pageTitle = "Search Products";
-    displayMessage("Please enter a search term to find products.", "info"); // More specific message
+    displayMessage("Please enter a search term to find products.", "info"); 
 }
 
 ?>
@@ -73,7 +66,6 @@ if (!empty($searchQuery)) {
             No products found matching your search for "<strong><?php echo htmlspecialchars($searchQuery); ?></strong>". Please try a different query.
         </div>
     <?php elseif (empty($products) && empty($searchQuery)): ?>
-        <!-- Message already displayed by displayMessage() function above -->
     <?php else: ?>
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
             <?php foreach ($products as $product): ?>
@@ -84,7 +76,7 @@ if (!empty($searchQuery)) {
                         </div>
                         <div class="product-card-body">
                             <h4><?php echo htmlspecialchars($product['name']); ?></h4>
-                            <p class="price">$<?php echo htmlspecialchars(number_format($product['price'], 2)); ?></p>
+                            <p class="price">Rs.<?php echo htmlspecialchars(number_format($product['price'], 2)); ?></p>
                             <?php if ($product['is_out_of_stock']): ?>
                                 <span class="out-of-stock-badge">Out of Stock</span>
                             <?php else: ?>

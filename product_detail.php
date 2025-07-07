@@ -27,8 +27,7 @@ $selectedSize = sanitizeInput($_POST['size'] ?? 'Small'); // Default to 'Small' 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     if ($product && !$product['is_out_of_stock']) {
-        // The selectedSize is already pulled from $_POST['size'] at the top
-        // Make sure a size was actually selected
+       
         if (!empty($selectedSize) && $selectedSize !== 'N/A') {
             $added = $cartManager->addToCart($productId, 1, $selectedSize);
             if ($added) {
@@ -68,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
                 <div class="product-info-details">
                     <h1><?php echo htmlspecialchars($product['name']); ?></h1>
                     <p class="description"><?php echo nl2br(htmlspecialchars($product['description'])); ?></p>
-                    <p class="price">$<?php echo number_format($product['price'], 2); ?></p>
+                    <p class="price">Rs.<?php echo number_format($product['price'], 2); ?></p>
 
 
                     <p><strong>Category:</strong> <?php echo htmlspecialchars($product['category_name'] ?? 'N/A'); ?></p>
@@ -157,7 +156,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Handle radio button styling (optional, depends on your CSS framework like Bootstrap)
     const sizeButtons = document.querySelectorAll('.size-options .btn-check');
     const sizeLabels = document.querySelectorAll('.size-options .size-btn');
 
@@ -168,7 +166,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.querySelector(`label[for="${radio.id}"]`).classList.add('active');
             }
         });
-        // Set initial active state on page load
         if (radio.checked) {
             document.querySelector(`label[for="${radio.id}"]`).classList.add('active');
         }

@@ -1,7 +1,6 @@
 <?php
 // classes/ProductFrontendManager.php
 
-// In C:\xampp\htdocs\msgm_clothing\classes\CartManager.php
 require_once __DIR__ . '/../admin/includes/database.php';
 
 class ProductFrontendManager {
@@ -19,12 +18,12 @@ class ProductFrontendManager {
      * @return array An array of product associative arrays.
      */
     public function getFilteredProducts($filter = 'all', $limit = null, $days = 30) {
-        $sql = ""; // Initialize SQL query string
+        $sql = ""; 
         $whereClause = "";
         $params = [];
         $types = "";
-        $orderBy = ""; // Default order, can be overridden by specific cases
-        $groupBy = ""; // For trendy products
+        $orderBy = ""; 
+        $groupBy = ""; 
 
         switch (strtolower($filter)) {
             case 'bridal':
@@ -65,22 +64,20 @@ class ProductFrontendManager {
                 break;
 
             case 'trendy':
-                // --- CORRECTED SQL FOR TRENDY PRODUCTS ---
                 $sql = "SELECT p.id, p.name, p.description, p.price, p.stock, p.image_url, c.name AS category_name, c.id AS category_id,
                                SUM(oi.quantity) AS total_ordered_quantity
                          FROM products p
                          LEFT JOIN categories c ON p.category_id = c.id
                          JOIN order_items oi ON p.id = oi.product_id
-                         JOIN orders o ON oi.order_id = o.id"; // Added JOIN to orders
+                         JOIN orders o ON oi.order_id = o.id"; 
                 
                 $whereClause = " WHERE o.order_date >= DATE_SUB(NOW(), INTERVAL ? DAY)"; // Date filter
-                $params[] = $days; // Bind the 'days' parameter
+                $params[] = $days; 
                 $types .= "i";
 
                 $groupBy = " GROUP BY p.id, p.name, p.description, p.price, p.stock, p.image_url, c.name, c.id";
                 $orderBy = "total_ordered_quantity DESC";
                 
-                // If limit is not explicitly set, use 3 for trendy products by default
                 if ($limit === null) {
                     $limit = 3; 
                 }
@@ -90,13 +87,13 @@ class ProductFrontendManager {
             default:
                 $sql = "SELECT p.id, p.name, p.description, p.price, p.stock, p.image_url, c.name AS category_name, c.id AS category_id
                         FROM products p LEFT JOIN categories c ON p.category_id = c.id";
-                $orderBy = "p.name ASC"; // Default alphabetical for 'all' products
+                $orderBy = "p.name ASC"; 
                 break;
         }
 
-        $fullSql = $sql . $whereClause . $groupBy; // Concatenate GROUP BY before ORDER BY
+        $fullSql = $sql . $whereClause . $groupBy;
         
-        if (!empty($orderBy)) { // Only append ORDER BY if it's not empty
+        if (!empty($orderBy)) { 
             $fullSql .= " ORDER BY " . $orderBy;
         }
 
@@ -113,7 +110,6 @@ class ProductFrontendManager {
         }
 
         if (!empty($params)) {
-            // Use call_user_func_array for bind_param with dynamic parameters
             $bind_names = array($types);
             for ($i = 0; $i < count($params); $i++) {
                 $bind_name = 'bind' . $i;
@@ -137,11 +133,7 @@ class ProductFrontendManager {
         return $products;
     }
 
-    /**
-     * Retrieves a single product by its ID.
-     * @param int $productId The ID of the product.
-     * @return array|null An associative array of product data, or null if not found.
-     */
+    
     public function getProductById($productId) {
         $sql = "SELECT p.id, p.name, p.description, p.price, p.stock, p.image_url, c.name AS category_name
                 FROM products p

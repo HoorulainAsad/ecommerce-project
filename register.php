@@ -4,7 +4,6 @@
 require_once __DIR__ . '/includes/header.php'; // Includes functions.php and starts session
 require_once __DIR__ . '/classes/UserFrontendManager.php';
 
-// If user is already logged in, redirect to home or profile
 if (isUserLoggedIn()) {
     redirectTo('index.php');
 }
@@ -35,8 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($userFrontendManager->registerUser($username, $email, $password)) {
             $message = "Registration successful! You can now log in.";
             $message_type = 'success';
-            // Optional: Redirect to login page after successful registration
-            // redirectTo('login.php?msg=' . urlencode($message) . '&type=' . $message_type);
+            
         } else {
             $message = "Registration failed. Email or username might already be taken.";
             $message_type = 'error';
@@ -78,6 +76,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </div>
 
-<?php
-// No footer include here as the body is handled by the container styling
-?>

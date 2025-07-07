@@ -19,20 +19,17 @@ class CartManager {
         $userId = $_SESSION['user_id'] ?? null;
         $sessionId = session_id();
 
-        // Check if product already in cart
-        // Also checks if the item is already selected by default
+        
         $stmt = $this->conn->prepare("SELECT id FROM cart WHERE product_id = ? AND size = ? AND (user_id = ? OR session_id = ?)");
         $stmt->bind_param("isis", $productId, $size, $userId, $sessionId);
         $stmt->execute();
         $result = $stmt->get_result();
 
         if ($row = $result->fetch_assoc()) {
-            // Update quantity and ensure it's checked by default if adding more
             $cartId = $row['id'];
             $stmt = $this->conn->prepare("UPDATE cart SET quantity = quantity + ?, is_checked = 1 WHERE id = ?"); // Set to checked when adding more
             $stmt->bind_param("ii", $quantity, $cartId);
         } else {
-            // Insert new, set is_checked to 1 by default
             $stmt = $this->conn->prepare("INSERT INTO cart (product_id, quantity, size, user_id, session_id, is_checked) VALUES (?, ?, ?, ?, ?, 1)");
             $stmt->bind_param("iisis", $productId, $quantity, $size, $userId, $sessionId);
         }
@@ -63,14 +60,9 @@ class CartManager {
         return $items;
     }
 
-    /**
-     * Retrieves only cart items that are marked as checked (selected for order).
-     * @return array
-     */
+    
     public function getCheckedCartItems() {
-        // This method also needs to consider user_id or session_id based on login status.
-        // For now, it only uses session_id. If a user is logged in, this might be incorrect.
-        // You should adapt this similarly to getTotalCartItemCount and getCartItems.
+        
         $userId = $_SESSION['user_id'] ?? null;
         $sessionId = session_id();
 
@@ -85,10 +77,7 @@ class CartManager {
     }
 
 
-    /**
-     * Calculates the grand total only for checked items in the cart.
-     * @return float
-     */
+   
     public function getCheckedCartTotal() {
         $checkedItems = $this->getCheckedCartItems();
         $total = 0.0;
@@ -104,12 +93,7 @@ class CartManager {
     }
 
 
-    /**
-     * Updates the 'is_checked' status of a specific cart item.
-     * @param int $cartId The ID of the cart item.
-     * @param bool $isChecked True if checked, false if unchecked.
-     * @return bool
-     */
+   
     public function updateItemCheckedStatus($cartId, $isChecked) {
         $status = $isChecked ? 1 : 0;
         $stmt = $this->conn->prepare("UPDATE cart SET is_checked = ? WHERE id = ?");
@@ -136,11 +120,7 @@ class CartManager {
         return $stmt->execute();
     }
 
-    /**
-     * Deletes a cart item.
-     * @param int $cartId
-     * @return bool
-     */
+    
     public function deleteItem($cartId) {
         $stmt = $this->conn->prepare("DELETE FROM cart WHERE id = ?");
         $stmt->bind_param("i", $cartId);
@@ -152,12 +132,10 @@ class CartManager {
         $userId = $_SESSION['user_id'] ?? null;
         $sessionId = session_id();
 
-        // Check if user is logged in (user_id is set)
         if ($userId) {
             $stmt = $this->conn->prepare("SELECT SUM(quantity) AS total FROM cart WHERE user_id = ?");
             $stmt->bind_param("i", $userId);
         } else {
-            // User is a guest, use session_id to get cart count from database
             $stmt = $this->conn->prepare("SELECT SUM(quantity) AS total FROM cart WHERE session_id = ?");
             $stmt->bind_param("s", $sessionId);
         }

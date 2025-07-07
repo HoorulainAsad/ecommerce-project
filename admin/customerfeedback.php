@@ -1,7 +1,7 @@
 <?php
 // admin/customerfeedback.php
 
-require_once __DIR__ . '/includes/functions.php'; // Includes config and starts session
+require_once __DIR__ . '/includes/functions.php'; 
 require_once __DIR__ . '/classes/ReviewManager.php';
 
 // Check if admin is logged in
@@ -12,8 +12,7 @@ if (!isLoggedIn()) {
 $reviewManager = new ReviewManager();
 
 $message = '';
-$message_type = ''; // success or error
-
+$message_type = ''; 
 // Handle review status update or deletion
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['review_action'])) {
     $reviewId = filter_var($_POST['review_id'] ?? 0, FILTER_VALIDATE_INT);
@@ -70,45 +69,7 @@ $reviews = $reviewManager->getAllReviews();
     <link href="https://fonts.googleapis.com/css2?family=Anonymous+Pro:ital,wght@0,400;0,700;1,400;1,700&family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>admin/assets/css/styles.css"> <!-- Link to external stylesheet -->
-    <!-- <style>
-        /* Specific styles for review status */
-        .review-status-pending {
-            color: #FFA500; /* Orange */
-            font-weight: 500;
-        }
-        .review-status-approved {
-            color: #28a745; /* Green */
-            font-weight: 500;
-        }
-        .review-status-rejected {
-            color: #dc3545; /* Red */
-            font-weight: 500;
-        }
-        .review-actions form {
-            display: inline-block;
-            margin-right: 5px;
-        }
-        .review-actions button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #A0522D;
-            font-size: 16px;
-            transition: color 0.3s ease;
-        }
-        .review-actions button:hover {
-            color: #8B4513;
-        }
-        .review-actions .delete-btn {
-            color: #dc3545;
-        }
-        .review-actions .delete-btn:hover {
-            color: #a71d2a;
-        }
-        .star-rating {
-            color: #FFD700; /* Gold */
-        }
-    </style> -->
+    
 </head>
 <body>
     <div class="admin-wrapper">

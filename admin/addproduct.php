@@ -1,7 +1,7 @@
 <?php
 // admin/addproduct.php
 
-require_once __DIR__ . '/includes/functions.php'; // Includes config and starts session
+require_once __DIR__ . '/includes/functions.php'; 
 require_once __DIR__ . '/classes/ProductManager.php';
 require_once __DIR__ . '/classes/CategoryManager.php';
 
@@ -14,8 +14,7 @@ $productManager = new ProductManager();
 $categoryManager = new CategoryManager();
 
 $message = '';
-$message_type = ''; // success or error
-
+$message_type = ''; 
 $uploadDir = __DIR__ . '/uploads/products/';
 if (!is_dir($uploadDir)) {
     mkdir($uploadDir, 0755, true);
@@ -29,8 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $categoryId = filter_var($_POST['category_id'] ?? 0, FILTER_VALIDATE_INT);
     $stock = filter_var($_POST['stock'] ?? 0, FILTER_VALIDATE_INT);
 
-    $imageUrlToSave = ''; // Default for new product if no image uploaded
-
+    $imageUrlToSave = ''; 
     // --- File Upload Handling ---
     if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] === UPLOAD_ERR_OK) {
         $file = $_FILES['product_image'];
@@ -46,11 +44,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (in_array($fileExt, $allowed)) {
             if ($fileError === 0) {
                 if ($fileSize < 5000000) { // Max 5MB file size
-                    $newFileName = uniqid('', true) . "." . $fileExt; // Generate unique file name
+                    $newFileName = uniqid('', true) . "." . $fileExt; 
                     $fileDestination = $uploadDir . $newFileName;
 
                     if (move_uploaded_file($fileTmpName, $fileDestination)) {
-                        $imageUrlToSave = 'admin/uploads/products/' . $newFileName; // Relative path from admin/
+                        $imageUrlToSave = 'admin/uploads/products/' . $newFileName; 
                     } else {
                         $message = "Error uploading file.";
                         $message_type = 'error';
