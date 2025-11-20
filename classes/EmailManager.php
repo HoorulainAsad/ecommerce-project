@@ -73,12 +73,12 @@ class EmailManager {
             $mail->isSMTP();
             $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
-            $mail->Username   = 'hoorulainasad583@gmail.com';
-            $mail->Password   = 'aoscxvtbcnibfotm'; 
+            $mail->Username   = 'dummy@gmail.com';
+            $mail->Password   = 'dummypassword'; 
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; 
             $mail->Port       = 587; // or 465 for SSL
 
-            $mail->setFrom('hoorulainasad583@gmail.com', 'MSGM Bridal'); // Your store's email address and name
+            $mail->setFrom('dummy@gmail.com', 'MSGM Bridal'); // Your store's email address and name
             $mail->addAddress($recipientEmail); 
 
             // Content
