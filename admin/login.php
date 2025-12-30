@@ -1,8 +1,8 @@
 <?php
 // admin/login.php
 
-require_once __DIR__ . '/includes/functions.php'; // Includes config and starts session
-require_once __DIR__ . '/includes/database.php'; // Include for database connection
+require_once __DIR__ . '/includes/functions.php'; 
+require_once __DIR__ . '/includes/database.php'; 
 
 // Check if admin is already logged in, redirect to dashboard
 if (isLoggedIn()) {
@@ -15,14 +15,13 @@ $error = false;
 // Handle login form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = sanitizeInput($_POST['username'] ?? '');
-    $password = $_POST['password'] ?? ''; // Don't sanitize password before checking hash
+    $password = $_POST['password'] ?? ''; 
 
     if (empty($username) || empty($password)) {
         $message = "Please enter both username and password.";
         $error = true;
     } else {
-        $conn = getDbConnection(); // Get database connection
-        // Select id, username, password, and the new 'role' column
+        $conn = getDbConnection(); 
         $sql = "SELECT id, username, password, role FROM admin_users WHERE username = ?";
         $stmt = $conn->prepare($sql);
         
@@ -40,8 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION[ADMIN_USERNAME_SESSION_KEY] = $user['username'];
                     $_SESSION[ADMIN_ROLE_SESSION_KEY] = $user['role']; // Store the admin's role
                     $stmt->close();
-                    // No need to close connection - shutdown function will handle it
-                    redirectToAdmin('index.php'); // Redirect to dashboard on successful login
+                    
+                    redirectToAdmin('index.php');
                 } else {
                     $message = "Invalid username or password.";
                     $error = true;
@@ -85,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" required autocomplete="current-password">
             </div>
-            <button type="submit" class="login-button">Login</button>
+            <button type="submit"  class="login-button">Login</button>
         </form>
     </div>
 </body>

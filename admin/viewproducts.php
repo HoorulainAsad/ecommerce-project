@@ -1,10 +1,9 @@
 <?php
-// admin/viewproducts.php (Previously manageproducts.php)
 
-require_once __DIR__ . '/includes/functions.php'; // Includes config and starts session
+require_once __DIR__ . '/includes/functions.php'; 
 require_once __DIR__ . '/classes/ProductManager.php';
 require_once __DIR__ . '/classes/CategoryManager.php';
-require_once __DIR__ . '/classes/OrderManager.php'; // Needed for trendy products
+require_once __DIR__ . '/classes/OrderManager.php'; 
 
 // Check if admin is logged in
 if (!isLoggedIn()) {

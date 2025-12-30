@@ -73,12 +73,12 @@ class EmailManager {
             $mail->isSMTP();
             $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
-            $mail->Username   = 'hoorulainasad583@gmail.com';
-            $mail->Password   = 'aoscxvtbcnibfotm'; 
+            $mail->Username   = 'dummymail@gmail.com';
+            $mail->Password   = 'dummy123'; 
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; 
             $mail->Port       = 587; // or 465 for SSL
 
-            $mail->setFrom('hoorulainasad583@gmail.com', 'MSGM Bridal'); // Your store's email address and name
+            $mail->setFrom('dummymail@gmail.com', 'MSGM Bridal'); // Your store's email address and name
             $mail->addAddress($recipientEmail); 
 
             // Content
@@ -167,7 +167,6 @@ class EmailManager {
         $messageBody .= "</p>
             <p>You can track your order status by logging into your account or by visiting <a href=\"" . WEB_ROOT_URL . "track_order.php?order_id=" . htmlspecialchars($orderDetails['id']) . "\">this link</a>.</p>";
 
-        // End building the email body with common footer
         $messageBody .= $this->getCommonEmailFooter();
 
         return $this->sendEmailWithPHPMailer($recipientEmail, $subject, $messageBody);
@@ -175,7 +174,6 @@ class EmailManager {
 
     
     public function sendOrderStatusUpdateEmail($recipientEmail, $orderDetails) {
-        // Ensure $orderDetails is an array and has necessary keys to prevent errors
         if (!is_array($orderDetails) || !isset($orderDetails['id'], $orderDetails['order_status'])) {
             error_log("sendOrderStatusUpdateEmail: Missing or invalid order details array.");
             return false;
@@ -191,7 +189,6 @@ class EmailManager {
 
             <p>You can expect further updates soon. Thank you for shopping with MSGM Bridal.</p>";
 
-        // Only display review section if the order is delivered
         if (isset($orderDetails['order_status']) && strtolower($orderDetails['order_status']) === 'delivered') {
             $messageBody .= "
             <h3>Review Your Items:</h3>
@@ -244,15 +241,8 @@ class EmailManager {
         return $this->sendEmailWithPHPMailer($recipientEmail, $subject, $messageBody);
     }
 
-    /**
-     * You can add other email sending methods here, e.g., for cancellation, password reset, etc.
-     * This method is also updated to use the common header/footer.
-     * @param string $recipientEmail
-     * @param array $orderDetails Expected to contain 'id', 'customer_name', 'reason'
-     * @return bool
-     */
+   
     public function sendOrderCancellationEmail($recipientEmail, $orderDetails) {
-        // Ensure $orderDetails is an array and has necessary keys
         if (!is_array($orderDetails) || !isset($orderDetails['id'], $orderDetails['customer_name'], $orderDetails['reason'])) {
             error_log("sendOrderCancellationEmail: Missing or invalid order details for cancellation.");
             return false;

@@ -159,12 +159,7 @@ class OrderManager {
         }
     }
 
-    /**
-     * Fetches full order details including customer info and all order items for email.
-     * This is the new method specifically for the EmailManager.
-     * @param int $orderId
-     * @return array|null Full order details or null if not found.
-     */
+   
     public function getOrderDetailsForEmail($orderId) {
         $orderDetails = null;
 
@@ -179,7 +174,7 @@ class OrderManager {
         $result = $stmt->get_result();
         if ($result->num_rows > 0) {
             $orderDetails = $result->fetch_assoc();
-            // Ensure 'created_at' or 'order_date' is set, as the email uses it
+        
             if (!isset($orderDetails['created_at']) && isset($orderDetails['order_date'])) {
                 $orderDetails['created_at'] = $orderDetails['order_date'];
             }

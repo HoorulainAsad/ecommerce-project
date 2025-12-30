@@ -83,9 +83,9 @@ class CartManager {
         $total = 0.0;
 
         foreach ($checkedItems as $item) {
-            $rawPrice = str_replace(',', '', $item['price']); // Remove commas if needed
-            $price = floatval($rawPrice);                     // Convert to float
-            $quantity = intval($item['quantity']);            // Make sure quantity is integer
+            $rawPrice = str_replace(',', '', $item['price']);
+            $price = floatval($rawPrice);                     
+            $quantity = intval($item['quantity']);           
             $total += $price * $quantity;
         }
 

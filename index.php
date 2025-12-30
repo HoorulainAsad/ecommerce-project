@@ -23,7 +23,7 @@ $heroImages = [
 ?>
 
 <!-- Hero Section (Image Slider) -->
-<section class="hero-section" style="position: relative; height: 90vh; overflow: hidden;">
+<section class="hero-section" style="position: relative; overflow: hidden;">
     <?php foreach ($heroImages as $index => $image): ?>
         <div class="hero-slide <?php echo ($index === 0) ? 'active' : ''; ?>" 
              style="position:absolute; top:0; left:0; width:100%; height:100%; background-size:cover; background-position:center; transition: opacity 0.5s; opacity:<?php echo ($index === 0) ? '1' : '0'; ?>; background-image: url('<?php echo $image; ?>');">

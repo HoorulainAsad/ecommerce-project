@@ -10,10 +10,7 @@ class CategoryFrontendManager {
         $this->conn = getDbConnection();
     }
 
-    /**
-     * Retrieves all categories from the database.
-     * @return array An array of category associative arrays.
-     */
+    
     public function getAllCategories() {
         $sql = "SELECT id, name FROM categories ORDER BY name ASC";
         $result = $this->conn->query($sql);
@@ -26,11 +23,7 @@ class CategoryFrontendManager {
         return $categories;
     }
 
-    /**
-     * Retrieves a single category by its name.
-     * @param string $categoryName The name of the category.
-     * @return array|null An associative array of category data, or null if not found.
-     */
+    
     public function getCategoryByName($categoryName) {
         $sql = "SELECT id, name FROM categories WHERE UPPER(name) = UPPER(?)";
         $stmt = $this->conn->prepare($sql);

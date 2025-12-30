@@ -19,13 +19,13 @@ $orderManager = new OrderManager();
 $userManager = new UserManager();
 $reviewManager = new ReviewManager();
 
+
 $totalProducts = $productManager->getTotalProductCount();
 $totalOrders = $orderManager->getTotalOrdersCount();
 $totalUsers = $userManager->getTotalUsersCount();
 $newArrivalsCount = $productManager->getNewArrivalsCount();
 $trendyCollectionCount = $orderManager->getTrendyProductsCount();
 $pendingReviews = $reviewManager->getReviewCountByStatus('Pending');
-$reviewManager = new ReviewManager();
 $allReviews = $reviewManager->getAllReviews();
 $totalReviews = count($allReviews);
 
@@ -97,6 +97,7 @@ $totalReviews = count($allReviews);
                     <div class="value"><?php echo $totalOrders; ?></div>
                     <div class="label">Total Orders</div>
                 </a>
+                
                 <a href="<?php echo BASE_URL; ?>admin/userdetails.php" class="stat-card-link">
                     <i class="fas fa-users icon"></i>
                     <div class="value"><?php echo $totalUsers; ?></div>

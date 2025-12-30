@@ -11,17 +11,6 @@ class ProductManager {
     }
 
   
-
-    /**
-     * Adds a new product to the database.
-     * @param string $name
-     * @param string $description
-     * @param float $price
-     * @param int $categoryId
-     * @param int $stock
-     * @param string $imageUrl
-     * @return bool True on success, false on failure.
-     */
     public function addProduct($name, $description, $price, $categoryId, $stock, $imageUrl) {
         $sql = "INSERT INTO products (name, description, price, category_id, stock, image_url, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())";
         $stmt = $this->conn->prepare($sql);
@@ -33,7 +22,7 @@ class ProductManager {
         $result = $stmt->execute();
         $stmt->close();
         return $result;
-    }
+    } 
 
     
     public function getAllProducts() {
@@ -63,17 +52,7 @@ class ProductManager {
         return $product;
     }
 
-    /**
-     * Updates an existing product.
-     * @param int $id
-     * @param string $name
-     * @param string $description
-     * @param float $price
-     * @param int $categoryId
-     * @param int $stock
-     * @param string|null $imageUrl The new image URL, or null to keep existing.
-     * @return bool True on success, false on failure.
-     */
+   
     public function updateProduct($id, $name, $description, $price, $categoryId, $stock, $imageUrl = null) {
         $sql = "UPDATE products SET name = ?, description = ?, price = ?, category_id = ?, stock = ?, updated_at = NOW()";
         $types = "ssdii";
@@ -254,17 +233,9 @@ class ProductManager {
 
    
 
-    /**
-     * Fetches the top N trending products based on total quantity ordered within a time frame.
-     * Requires 'order_items' and 'orders' tables.
-     *
-     * @param int $limit The number of trending products to retrieve (default: 3).
-     * @param int $days The number of days to look back for orders (default: 30).
-     * @return array An array of trending product data.
-     */
+   
     public function getTrendyProducts($limit = 3, $days = 30) {
-        // It's crucial to use LEFT JOIN for 'categories' in case a product has no category assigned.
-        // For 'order_items' and 'orders', INNER JOIN is generally correct if you only want products that HAVE been ordered.
+       
         $sql = "SELECT
                     p.id,
                     p.name,
@@ -293,7 +264,7 @@ class ProductManager {
         $stmt = $this->conn->prepare($sql);
         if (!$stmt) {
             error_log("ProductManager::getTrendyProducts - Prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
-            return []; // Return empty array on error
+            return []; 
         }
 
         // Bind parameters: 'ii' for two integers ($days, $limit)

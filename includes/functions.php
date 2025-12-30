@@ -9,11 +9,6 @@ if (session_status() == PHP_SESSION_NONE) {
 require_once __DIR__ . '/../admin/includes/database.php';
 
 
-/**
- * Sanitizes input data to prevent XSS.
- * @param string $data The input string to sanitize.
- * @return string The sanitized string.
- */
 function sanitizeInput($data) {
     $data = trim($data);
     $data = stripslashes($data);

@@ -2,7 +2,6 @@
 require_once __DIR__ . '/includes/header.php'; // header and session
 require_once __DIR__ . '/includes/functions.php'; // For displayMessage()
 
-// Get message from URL
 $message = sanitizeInput($_GET['msg'] ?? 'Order placed successfully! Thank you for ordering. You will receive a confirmation email soon.');
 $message_type = sanitizeInput($_GET['type'] ?? 'success');
 ?>

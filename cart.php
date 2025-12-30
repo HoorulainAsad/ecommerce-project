@@ -26,15 +26,15 @@ $initialCheckedGrandTotal = $cartManager->getCheckedCartTotal(); // Get initial 
             <tbody>
                 <?php foreach ($cartItems as $item): ?>
                     <tr data-cart-id="<?php echo $item['id']; ?>" data-price="<?php echo $item['price']; ?>">
-                        <td>
+                        <td data-label="Select">
                             <input type="checkbox" class="cart-item-checkbox"
                                    data-cart-id="<?php echo $item['id']; ?>"
                                    <?php echo $item['is_checked'] ? 'checked' : ''; ?>>
                         </td>
-                        <td><img src="<?php echo htmlspecialchars($item['image_url']); ?>" alt="Product" width="60" height="60" onerror="this.src='https://placehold.co/60x60';"></td>
-                        <td><?php echo htmlspecialchars($item['name']); ?></td>
-                        <td><?php echo htmlspecialchars($item['size']); ?></td>
-                        <td>
+                        <td data-label="Image"><img src="<?php echo htmlspecialchars($item['image_url']); ?>" alt="Product" width="60" height="60" onerror="this.src='https://placehold.co/60x60';"></td>
+                        <td data-label="Product"><?php echo htmlspecialchars($item['name']); ?></td>
+                        <td data-label="Size"><?php echo htmlspecialchars($item['size']); ?></td>
+                        <td data-label="Quantity">
                             <form method="POST" action="update_cart.php" style="display:inline-block;" class="update-quantity-form">
                                 <input type="hidden" name="cart_id" value="<?php echo $item['id']; ?>">
                                 <input type="hidden" name="action" value="decrease">
@@ -49,9 +49,9 @@ $initialCheckedGrandTotal = $cartManager->getCheckedCartTotal(); // Get initial 
                                 <button type="submit" class="btn btn-sm btn-outline-secondary">+</button>
                             </form>
                         </td>
-                        <td>Rs.<span class="item-price"><?php echo number_format($item['price'], 2); ?></span></td>
-                        <td>Rs.<span class="item-total"><?php echo number_format($item['price'] * $item['quantity'], 2); ?></span></td>
-                        <td>
+                        <td data-label="Price">Rs.<span class="item-price"><?php echo number_format($item['price'], 2); ?></span></td>
+                        <td data-label="Total">Rs.<span class="item-total"><?php echo number_format($item['price'] * $item['quantity'], 2); ?></span></td>
+                        <td data-label="Actions">
                             <form method="POST" action="update_cart.php" class="delete-item-form">
                                 <input type="hidden" name="cart_id" value="<?php echo $item['id']; ?>">
                                 <input type="hidden" name="action" value="delete">
